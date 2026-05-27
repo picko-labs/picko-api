@@ -1,0 +1,108 @@
+erDiagram
+
+    users {
+        bigint      id               PK  "사용자 고유 식별자"
+        varchar255  name                 "서비스 닉네임"
+        varchar255  email                "로그인 이메일 (UNIQUE)"
+        varchar20   auth_provider        "APPLE | GOOGLE | LINE"
+        varchar255  auth_provider_id     "OAuth UID (소셜 로그인)"
+        varchar10   nationality          "국적 ISO 코드 (KR, US …)"
+        tinyint1    living_in_korea      "한국 거주 인증 여부"
+        timestamp   created_at           "계정 생성 일시"
+        timestamp   updated_at           "최종 수정 일시"
+        timestamp   deleted_at           "삭제 일시 (soft delete)"
+    }
+
+    spot_address {
+        bigint      id          PK  "주소 고유 식별자"
+        varchar50   code            "주소 코드 (seoul, busan …)"
+        varchar50   name            "한글명 (서울, 부산 …)"
+        varchar100  name_en         "영문명 (Seoul, Busan …)"
+        timestamp   created_at      "생성 일시"
+        timestamp   updated_at      "최종 수정 일시"
+        timestamp   deleted_at      "삭제 일시 (soft delete)"
+    }
+
+    spot_categories {
+        bigint      id          PK  "카테고리 고유 식별자"
+        varchar50   code            "카테고리 코드 (cafe, food …)"
+        varchar100  name            "표시명 (Cafe, Food …)"
+        varchar50   icon            "아이콘 이모지 (☕, 🍜 …)"
+        int         sort_order      "노출 순서"
+        timestamp   created_at      "생성 일시"
+        timestamp   updated_at      "최종 수정 일시"
+        timestamp   deleted_at      "삭제 일시 (soft delete)"
+    }
+
+    spots {
+        bigint      id              PK  "장소 고유 식별자"
+        varchar255  name                "장소명"
+        bigint      spot_address_id FK  "주소 분류 (spot_address.id)"
+        varchar255  location            "동/구 단위 지역명"
+        varchar500  address             "도로명 전체 주소"
+        text        description         "장소 소개 문구"
+        decimal10_7 latitude            "위도 (WGS84)"
+        decimal10_7 longitude           "경도 (WGS84)"
+        varchar500  image_url           "대표 이미지 URL"
+        tinyint1    is_trending         "트렌딩 강조 여부"
+        bigint      user_id         FK  "등록자 (users.id)"
+        timestamp   created_at          "등록 일시"
+        timestamp   updated_at          "최종 수정 일시"
+        timestamp   deleted_at          "삭제 일시 (soft delete)"
+    }
+
+    spot_category_mappings {
+        bigint      spot_id          FK  "장소 (spots.id)"
+        bigint      spot_category_id FK  "카테고리 (spot_categories.id)"
+        timestamp   created_at           "연결 생성 일시"
+        timestamp   updated_at           "연결 수정 일시"
+        timestamp   deleted_at           "연결 삭제 일시 (soft delete)"
+    }
+
+    user_pins {
+        bigint      id          PK  "픽 고유 식별자"
+        bigint      user_id     FK  "사용자 (users.id)"
+        bigint      spot_id     FK  "장소 (spots.id)"
+        timestamp   created_at      "픽 등록 일시"
+        timestamp   updated_at      "픽 수정 일시"
+        timestamp   deleted_at      "픽 삭제 일시 (soft delete)"
+    }
+
+    spot_hashtags {
+        bigint      id          PK  "해시태그 고유 식별자"
+        varchar50   code            "태그 코드 (hot, rising, kpop …)"
+        varchar100  name            "표시명 (Hot Place, Rising …)"
+        varchar50   icon            "아이콘 이모지 (🔥, 🌟 …)"
+        int         sort_order      "필터 칩 노출 순서"
+        timestamp   created_at      "생성 일시"
+        timestamp   updated_at      "최종 수정 일시"
+        timestamp   deleted_at      "삭제 일시 (soft delete)"
+    }
+
+    spot_hashtag_mappings {
+        bigint      spot_id         FK  "장소 (spots.id)"
+        bigint      spot_hashtag_id FK  "해시태그 (spot_hashtags.id)"
+        timestamp   created_at          "연결 생성 일시"
+        timestamp   updated_at          "연결 수정 일시"
+        timestamp   deleted_at          "연결 삭제 일시 (soft delete)"
+    }
+
+    %% ── 관계 정의 ──────────────────────────────────────────
+
+    %% users → spots : 유저가 스팟을 직접 등록
+    users                ||--o{ spots                    : "등록(user_id)"
+
+    %% users ↔ spots : 유저가 스팟을 픽(북마크)
+    users                ||--o{ user_pins                : "픽한 유저"
+    spots                ||--o{ user_pins                : "픽된 스팟"
+
+    %% spots ↔ spot_categories : 스팟 카테고리 (N개)
+    spots                ||--o{ spot_category_mappings   : "카테고리 연결"
+    spot_categories      ||--o{ spot_category_mappings   : "카테고리"
+
+    %% spots → spot_address : 주소 분류
+    spot_address         |o--o{ spots                    : "주소 분류"
+
+    %% spots ↔ spot_hashtags : 해시태그 필터
+    spots                ||--o{ spot_hashtag_mappings    : "해시태그 연결"
+    spot_hashtags        ||--o{ spot_hashtag_mappings    : "해시태그"
