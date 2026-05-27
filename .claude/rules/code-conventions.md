@@ -7,7 +7,7 @@
 | Controller | `controller/` | `{Domain}Controller` |
 | Service | `service/` | `{Domain}Service` |
 | DTO | `service/vo/` | `{Domain}ServiceDto` |
-| Entity | `repository/dvo/` | `{Domain}Entity` |
+| Entity | `repository/entity/` | `{Domain}Entity` |
 | Repository | `repository/` | `{Domain}Repository` |
 
 ## DTO 패턴

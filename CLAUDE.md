@@ -23,7 +23,8 @@ com.picko.api
 ├── service/
 │   └── vo/              # 서비스 계층 DTO (Request / Response)
 └── repository/
-    ├── dvo/             # JPA Entity
+    ├── entity/          # JPA Entity
+    │   └── id/          # 복합 PK (@Embeddable)
     └── dao/             # QueryDSL / 커스텀 쿼리 (필요 시)
 ```
 
