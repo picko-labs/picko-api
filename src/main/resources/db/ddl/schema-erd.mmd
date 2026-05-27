@@ -13,6 +13,16 @@ erDiagram
         timestamp   deleted_at           "삭제 일시 (soft delete)"
     }
 
+    admins {
+        bigint      id          PK  "어드민 고유 식별자"
+        varchar255  name            "어드민 이름"
+        varchar255  email           "로그인 이메일 (UNIQUE)"
+        varchar255  password        "해시된 비밀번호"
+        timestamp   created_at      "계정 생성 일시"
+        timestamp   updated_at      "최종 수정 일시"
+        timestamp   deleted_at      "삭제 일시 (soft delete)"
+    }
+
     spot_address {
         bigint      id          PK  "주소 고유 식별자"
         varchar50   code            "주소 코드 (seoul, busan …)"
@@ -45,7 +55,8 @@ erDiagram
         decimal10_7 longitude           "경도 (WGS84)"
         varchar500  image_url           "대표 이미지 URL"
         tinyint1    is_trending         "트렌딩 강조 여부"
-        bigint      user_id         FK  "등록자 (users.id)"
+        bigint      user_id         FK  "사용자 등록자 (users.id)"
+        bigint      admin_id        FK  "어드민 등록자 (admins.id)"
         timestamp   created_at          "등록 일시"
         timestamp   updated_at          "최종 수정 일시"
         timestamp   deleted_at          "삭제 일시 (soft delete)"
@@ -91,6 +102,9 @@ erDiagram
 
     %% users → spots : 유저가 스팟을 직접 등록
     users                ||--o{ spots                    : "등록(user_id)"
+
+    %% admins → spots : 어드민이 스팟을 등록
+    admins               ||--o{ spots                    : "등록(admin_id)"
 
     %% users ↔ spots : 유저가 스팟을 픽(북마크)
     users                ||--o{ user_pins                : "픽한 유저"

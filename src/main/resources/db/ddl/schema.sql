@@ -198,7 +198,7 @@ CREATE TABLE spot_hashtags (
   COMMENT='지도 상단 해시태그 필터 (Hot Place / Rising / K-POP 등)';
 
 -- ────────────────────────────────────────────────────────────
--- 8. spot_hashtag_mappings
+-- 9. spot_hashtag_mappings
 --
 -- 목적: 장소와 해시태그의 M:N 연결 관계 관리
 -- 설명: 하나의 스팟이 여러 해시태그에 속할 수 있고,
