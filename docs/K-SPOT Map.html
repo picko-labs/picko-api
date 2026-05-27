@@ -1,0 +1,2982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K●SPOT - All of Korea's trends. One spot.</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* K-Culture Official Colors */
+            --primary-dark: #8C1818;
+            --primary: #F04040;
+            --primary-light: #F56E6E;
+            --primary-tint: #FDDEDE;
+            
+            --secondary-dark: #1A3580;
+            --secondary: #4A8FE0;
+            --secondary-light: #7AB0EE;
+            --secondary-tint: #D6E8FA;
+            
+            --tertiary-dark: #965800;
+            --tertiary: #F5B820;
+            --tertiary-light: #F8CE60;
+            --tertiary-tint: #FEF3D6;
+            
+            --neutral-night: #111318;
+            --neutral-dusk: #4A4D55;
+            --neutral-paper: #E8E6E1;
+            --neutral-cream: #F7F5F2;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: var(--neutral-cream);
+            --text-primary: var(--neutral-night);
+            --text-secondary: var(--neutral-dusk);
+            --text-tertiary: var(--neutral-dusk);
+            --border-color: var(--neutral-paper);
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 20px;
+            --spacing-2xl: 24px;
+            --spacing-3xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            
+            --font-size-label: 11px;
+            --font-size-caption: 13px;
+            --font-size-body: 15px;
+            --font-size-headline: 17px;
+            --font-size-title: 22px;
+            --font-size-display: 28px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+        }
+
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        #root {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Map Container */
+        .map-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .map-view {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Search Bar - matches the screenshot */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .search-menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            position: relative;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+        .search-menu-btn::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: var(--font-size-body);
+            color: var(--text-primary);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            gap: var(--spacing-sm);
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: var(--spacing-md) 0;
+        }
+
+        .category-filter::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            font-size: var(--font-size-caption);
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+
+        .category-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .category-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Sidebar Panel - floats inside map */
+        .sidebar-panel {
+            position: absolute;
+            left: var(--spacing-lg);
+            top: 88px;
+            bottom: var(--spacing-lg);
+            width: 400px;
+            z-index: 20;
+            display: flex;
+            flex-direction: row;
+            transition: transform 0.3s ease-out;
+        }
+
+        .sidebar-panel.collapsed {
+            transform: translateX(calc(-400px - var(--spacing-lg)));
+        }
+
+        .sidebar-inner {
+            flex: 1;
+            background: var(--bg-primary);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* Standalone toggle button — lives outside sidebar-panel */
+        .sidebar-toggle {
+            position: absolute;
+            left: calc(var(--spacing-lg) + 400px);
+            top: calc(88px + (100vh - 88px - var(--spacing-lg) - 72px) / 2);
+            width: 28px;
+            height: 72px;
+            background: var(--bg-primary);
+            border: none;
+            border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+            box-shadow: 4px 0 16px rgba(0,0,0,0.08);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            z-index: 25;
+            transition: left 0.3s ease-out, background 0.2s;
+        }
+
+        .sidebar-toggle.collapsed {
+            left: var(--spacing-lg);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--neutral-cream);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.14);
+        }
+
+        .sidebar-toggle:hover .toggle-chevron {
+            color: var(--primary);
+        }
+
+        .toggle-chevron {
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .sidebar-header {
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--neutral-paper);
+            flex-shrink: 0;
+        }
+
+        /* Tab Toggle - Segmented Control */
+        .scope-tabs {
+            display: flex;
+            gap: 0;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md);
+            flex-shrink: 0;
+        }
+
+        .scope-tabs-inner {
+            display: flex;
+            width: 100%;
+            background: var(--neutral-cream);
+            border-radius: var(--radius-md);
+            padding: 3px;
+        }
+
+        .scope-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: 10px var(--spacing-lg);
+            border: none;
+            border-radius: calc(var(--radius-md) - 3px);
+            background: transparent;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .scope-tab.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-weight: var(--font-weight-semibold);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.04);
+        }
+
+        .scope-tab .tab-icon {
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .scope-tab:not(.active) .tab-icon {
+            opacity: 0.5;
+        }
+
+        /* Section Header in sidebar */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-lg);
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: var(--font-size-headline);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .update-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: var(--font-size-caption);
+            color: var(--secondary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .update-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--secondary);
+        }
+
+        /* Sidebar Bottom Navigation */
+        .sidebar-bottom-nav {
+            display: flex;
+            align-items: stretch;
+            border-top: 1px solid var(--neutral-paper);
+            background: var(--bg-primary);
+            flex-shrink: 0;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .sidebar-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px var(--spacing-sm) 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .sidebar-nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: transparent;
+            border-radius: 0 0 2px 2px;
+            transition: background 0.15s;
+        }
+
+        .sidebar-nav-item.active::before {
+            background: var(--primary);
+        }
+
+        .sidebar-nav-icon {
+            font-size: 22px;
+            line-height: 1;
+            transition: transform 0.15s;
+        }
+
+        .sidebar-nav-item.active .sidebar-nav-icon {
+            transform: scale(1.1);
+        }
+
+        .sidebar-nav-label {
+            font-size: 11px;
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+            letter-spacing: 0;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .sidebar-nav-item.active .sidebar-nav-label {
+            color: var(--primary);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .sidebar-nav-item:hover:not(.active) .sidebar-nav-icon {
+            transform: translateY(-1px);
+        }
+
+        /* Pick tab content */
+        .pick-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px var(--spacing-2xl);
+            text-align: center;
+            gap: var(--spacing-lg);
+            flex: 1;
+        }
+
+        /* Lifestyle content */
+        .lifestyle-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg) var(--spacing-xl);
+        }
+
+        .lifestyle-card {
+            aspect-ratio: 1;
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: var(--spacing-lg);
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lifestyle-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .lifestyle-card-label {
+            font-size: var(--font-size-caption);
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            z-index: 1;
+        }
+
+        .lifestyle-card-title {
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            z-index: 1;
+            line-height: 1.3;
+        }
+        /* Squircle Region Cards */
+        .region-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 20px;
+            padding: var(--spacing-sm) var(--spacing-xl) var(--spacing-xl);
+        }
+        .region-card-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .region-card-wrap:hover { transform: translateY(-3px); }
+        .region-bubble {
+            background: white;
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: var(--font-size-caption);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            letter-spacing: -0.2px;
+        }
+        .region-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 8px solid white;
+        }
+        .region-squircle {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 32%;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .region-squircle-img {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+        }
+        .region-squircle-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.65) 100%);
+        }
+        .region-squircle-name {
+            position: absolute;
+            bottom: var(--spacing-lg);
+            left: var(--spacing-lg);
+            font-size: 20px;
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            letter-spacing: -0.5px;
+        }
+        .region-squircle-rank {
+            position: absolute;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            font-size: 28px;
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            font-style: italic;
+            line-height: 1;
+            letter-spacing: -2px;
+            opacity: 0.9;
+        }
+
+        .ranked-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            padding: 0 var(--spacing-xl);
+        }
+
+        .ranked-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background: var(--neutral-paper);
+        }
+
+        .ranked-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .ranked-card-img {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .ranked-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.7) 100%);
+        }
+
+        .ranked-card-number {
+            position: absolute;
+            top: var(--spacing-md);
+            left: var(--spacing-lg);
+            font-size: 42px;
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            font-style: italic;
+            line-height: 1;
+            letter-spacing: -2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .ranked-card-hashtag {
+            position: absolute;
+            top: 58px;
+            left: var(--spacing-lg);
+            right: var(--spacing-lg);
+            font-size: var(--font-size-headline);
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            line-height: 1.3;
+            letter-spacing: -0.3px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .ranked-card-menu {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .ranked-card-menu:hover {
+            opacity: 1;
+        }
+
+        .ranked-card-footer {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: var(--spacing-sm);
+        }
+
+        .ranked-card-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .ranked-card-name {
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .ranked-card-distance {
+            font-size: var(--font-size-caption);
+            color: rgba(255,255,255,0.85);
+        }
+
+        .ranked-card-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-shrink: 0;
+        }
+
+        .ranked-card-star {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.9;
+            transition: all 0.2s;
+            padding: 2px;
+        }
+
+        .ranked-card-star:hover {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .ranked-card-star.starred {
+            color: var(--tertiary);
+        }
+
+        .show-more-btn {
+            margin: var(--spacing-xl) auto;
+            padding: var(--spacing-md) var(--spacing-3xl);
+            background: var(--bg-primary);
+            border: 1px solid var(--neutral-paper);
+            border-radius: 999px;
+            font-family: inherit;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            transition: all 0.2s;
+        }
+
+        .show-more-btn:hover {
+            background: var(--neutral-cream);
+            border-color: var(--text-secondary);
+        }
+
+        .sidebar-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: var(--spacing-lg);
+        }
+
+        /* Floating Detail Card */
+        .detail-card {
+            position: absolute;
+            right: var(--spacing-xl);
+            bottom: var(--spacing-xl);
+            width: 360px;
+            max-height: 500px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 15;
+            overflow: hidden;
+            transition: all 0.3s ease-out;
+        }
+
+        .detail-card.hidden {
+            transform: translateY(600px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .detail-header {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .detail-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .detail-close:hover {
+            transform: scale(1.1);
+        }
+
+        .detail-body {
+            padding: var(--spacing-xl);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Spot List */
+        .spot-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .spot-item {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .spot-item:hover {
+            background: var(--gray-200);
+            transform: translateX(4px);
+        }
+
+        .spot-image {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+        }
+
+        .spot-info {
+            flex: 1;
+        }
+
+        .spot-name {
+            font-size: var(--font-size-body);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .spot-category {
+            font-size: var(--font-size-label);
+            color: var(--text-tertiary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .spot-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-size-caption);
+            color: var(--text-secondary);
+        }
+
+        .pin-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .pin-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Map Markers - Photo Pin Style */
+        .marker {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 5;
+            transform: translate(-50%, -100%);
+        }
+
+        .marker:hover {
+            z-index: 6;
+            transform: translate(-50%, -100%) scale(1.08);
+        }
+
+        .marker-pin {
+            position: relative;
+            width: 56px;
+            height: 56px;
+        }
+
+        .marker-photo {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .marker-photo-inner {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .marker-tail {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 9px solid white;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.15));
+        }
+
+        .marker.trending .marker-photo {
+            border-color: var(--tertiary);
+            box-shadow: 0 4px 14px rgba(245,184,32,0.4);
+        }
+
+        .marker.trending .marker-tail {
+            border-top-color: var(--tertiary);
+        }
+
+        .marker.selected .marker-photo {
+            border-color: var(--primary);
+            box-shadow: 0 4px 14px rgba(240,64,64,0.4);
+        }
+
+        .marker.selected .marker-tail {
+            border-top-color: var(--primary);
+        }
+
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            bottom: var(--spacing-xl);
+            left: 436px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            z-index: 10;
+            transition: left 0.3s ease-out;
+        }
+
+        .map-controls.sidebar-collapsed {
+            left: var(--spacing-lg);
+        }
+
+        .control-btn {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-primary);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .control-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Top Bar - Search bar that sits above sidebar */
+        .top-bar {
+            position: absolute;
+            top: var(--spacing-lg);
+            left: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: 25;
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+            transition: left 0.3s ease-out;
+            pointer-events: none;
+        }
+
+        .top-bar > * {
+            pointer-events: auto;
+        }
+
+        .top-bar-search {
+            width: 400px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease-out;
+        }
+
+        /* Search bar is NOT affected by sidebar collapse */
+
+        /* Category Chips Bar */
+        .category-bar {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            gap: var(--spacing-sm);
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: var(--spacing-xs) var(--spacing-xs);
+        }
+
+
+
+        .category-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 10px var(--spacing-lg);
+            background: var(--bg-primary);
+            border-radius: 999px;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.18s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.03);
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+
+        .category-chip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .category-chip.active {
+            background: var(--text-primary);
+            color: white;
+            border-color: var(--text-primary);
+        }
+
+        .category-chip-icon {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: 2px var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-label);
+            font-weight: 600;
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+    
+    <script type="text/babel" data-presets="react">
+
+// tweaks-panel.jsx
+// Reusable Tweaks shell + form-control helpers.
+//
+// Owns the host protocol (listens for __activate_edit_mode / __deactivate_edit_mode,
+// posts __edit_mode_available / __edit_mode_set_keys / __edit_mode_dismissed) so
+// individual prototypes don't re-roll it. Ships a consistent set of controls so you
+// don't hand-draw <input type="range">, segmented radios, steppers, etc.
+//
+// Usage (in an HTML file that loads React + Babel):
+//
+//   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+//     "primaryColor": "#D97757",
+//     "palette": ["#D97757", "#29261b", "#f6f4ef"],
+//     "fontSize": 16,
+//     "density": "regular",
+//     "dark": false
+//   }/*EDITMODE-END*/;
+//
+//   function App() {
+//     const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+//     return (
+//       <div style={{ fontSize: t.fontSize, color: t.primaryColor }}>
+//         Hello
+//         <TweaksPanel>
+//           <TweakSection label="Typography" />
+//           <TweakSlider label="Font size" value={t.fontSize} min={10} max={32} unit="px"
+//                        onChange={(v) => setTweak('fontSize', v)} />
+//           <TweakRadio  label="Density" value={t.density}
+//                        options={['compact', 'regular', 'comfy']}
+//                        onChange={(v) => setTweak('density', v)} />
+//           <TweakSection label="Theme" />
+//           <TweakColor  label="Primary" value={t.primaryColor}
+//                        options={['#D97757', '#2A6FDB', '#1F8A5B', '#7A5AE0']}
+//                        onChange={(v) => setTweak('primaryColor', v)} />
+//           <TweakColor  label="Palette" value={t.palette}
+//                        options={[['#D97757', '#29261b', '#f6f4ef'],
+//                                  ['#475569', '#0f172a', '#f1f5f9']]}
+//                        onChange={(v) => setTweak('palette', v)} />
+//           <TweakToggle label="Dark mode" value={t.dark}
+//                        onChange={(v) => setTweak('dark', v)} />
+//         </TweaksPanel>
+//       </div>
+//     );
+//   }
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+
+  .twk-num{display:flex;align-items:center;box-sizing:border-box;min-width:0;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+
+  .twk-chips{display:flex;gap:6px}
+  .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
+    padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
+    box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
+    transition:transform .12s cubic-bezier(.3,.7,.4,1),box-shadow .12s}
+  .twk-chip:hover{transform:translateY(-1px);
+    box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}
+  .twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),
+    0 2px 6px rgba(0,0,0,.15)}
+  .twk-chip>span{position:absolute;top:0;bottom:0;right:0;width:34%;
+    display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i{flex:1;box-shadow:0 -1px 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i:first-child{box-shadow:none}
+  .twk-chip svg{position:absolute;top:6px;left:6px;width:13px;height:13px;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+`;
+
+// ── useTweaks ───────────────────────────────────────────────────────────────
+// Single source of truth for tweak values. setTweak persists via the host
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
+  // useState-style call doesn't write a "[object Object]" key into the persisted
+  // JSON block.
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+    // Same-window signal so in-page listeners (deck-stage rail thumbnails)
+    // can react — the parent message only reaches the host, not peers.
+    window.dispatchEvent(new CustomEvent('tweakchange', { detail: edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+// ── TweaksPanel ─────────────────────────────────────────────────────────────
+// Floating shell. Registers the protocol listener BEFORE announcing
+// availability — if the announce ran first, the host's activate could land
+// before our handler exists and the toolbar toggle would silently no-op.
+// The close button posts __edit_mode_dismissed so the host's toolbar toggle
+// flips off in lockstep; the host echoes __deactivate_edit_mode back which
+// is what actually hides the panel.
+function TweaksPanel({ title = 'Tweaks', noDeckControls = false, children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  // Auto-inject a rail toggle when a <deck-stage> is on the page. The
+  // toggle drives the deck's per-viewer _railVisible via window message;
+  // state is mirrored from the same localStorage key the deck reads so
+  // the control reflects reality across reloads. The mechanism is the
+  // message — authors who want custom placement can post it directly
+  // and pass noDeckControls to suppress this one.
+  const hasDeckStage = React.useMemo(
+    () => typeof document !== 'undefined' && !!document.querySelector('deck-stage'),
+    [],
+  );
+  // deck-stage enables its rail in connectedCallback, but this panel can
+  // mount before that element has upgraded. The initial read catches the
+  // common case; the listener covers mounting first. (Older deck-stage.js
+  // copies still wait for the host's __omelette_rail_enabled postMessage —
+  // same listener handles those.)
+  const [railEnabled, setRailEnabled] = React.useState(
+    () => hasDeckStage && !!document.querySelector('deck-stage')?._railEnabled,
+  );
+  React.useEffect(() => {
+    if (!hasDeckStage || railEnabled) return undefined;
+    const onMsg = (e) => {
+      if (e.data && e.data.type === '__omelette_rail_enabled') setRailEnabled(true);
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [hasDeckStage, railEnabled]);
+  const [railVisible, setRailVisible] = React.useState(() => {
+    try { return localStorage.getItem('deck-stage.railVisible') !== '0'; } catch (e) { return true; }
+  });
+  const toggleRail = (on) => {
+    setRailVisible(on);
+    window.postMessage({ type: '__deck_rail_visible', on }, '*');
+  };
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" data-noncommentable=""
+           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">
+          {children}
+          {hasDeckStage && railEnabled && !noDeckControls && (
+            <TweakSection label="Deck">
+              <TweakToggle label="Thumbnail rail" value={railVisible} onChange={toggleRail} />
+            </TweakSection>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── Layout helpers ──────────────────────────────────────────────────────────
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Controls ────────────────────────────────────────────────────────────────
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step}
+             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              role="switch" aria-checked={!!value}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  // The active value is read by pointer-move handlers attached for the lifetime
+  // of a drag — ref it so a stale closure doesn't fire onChange for every move.
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  // Segments wrap mid-word once per-segment width runs out. The track is
+  // ~248px (280 panel − 28 body pad − 4 seg pad), each button loses 12px
+  // to its own padding, and 11.5px system-ui averages ~6.3px/char — so 2
+  // options fit ~16 chars each, 3 fit ~10. Past that (or >3 options), fall
+  // back to a dropdown rather than wrap.
+  const labelLen = (o) => String(typeof o === 'object' ? o.label : o).length;
+  const maxLen = options.reduce((m, o) => Math.max(m, labelLen(o)), 0);
+  const fitsAsSegments = maxLen <= ({ 2: 16, 3: 10 }[options.length] ?? 0);
+  if (!fitsAsSegments) {
+    // <select> emits strings — map back to the original option value so the
+    // fallback stays type-preserving (numbers, booleans) like the segment path.
+    const resolve = (s) => {
+      const m = options.find((o) => String(typeof o === 'object' ? o.value : o) === s);
+      return m === undefined ? s : typeof m === 'object' ? m.value : m;
+    };
+    return <TweakSelect label={label} value={value} options={options}
+                        onChange={(s) => onChange(resolve(s))} />;
+  }
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+                      width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => {
+          const v = typeof o === 'object' ? o.value : o;
+          const l = typeof o === 'object' ? o.label : o;
+          return <option key={v} value={v}>{l}</option>;
+        })}
+      </select>
+    </TweakRow>
+  );
+}
+
+function TweakText({ label, value, placeholder, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <input className="twk-field" type="text" value={value} placeholder={placeholder}
+             onChange={(e) => onChange(e.target.value)} />
+    </TweakRow>
+  );
+}
+
+function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) {
+  const clamp = (n) => {
+    if (min != null && n < min) return min;
+    if (max != null && n > max) return max;
+    return n;
+  };
+  const startRef = React.useRef({ x: 0, val: 0 });
+  const onScrubStart = (e) => {
+    e.preventDefault();
+    startRef.current = { x: e.clientX, val: value };
+    const decimals = (String(step).split('.')[1] || '').length;
+    const move = (ev) => {
+      const dx = ev.clientX - startRef.current.x;
+      const raw = startRef.current.val + dx * step;
+      const snapped = Math.round(raw / step) * step;
+      onChange(clamp(Number(snapped.toFixed(decimals))));
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return (
+    <div className="twk-num">
+      <span className="twk-num-lbl" onPointerDown={onScrubStart}>{label}</span>
+      <input type="number" value={value} min={min} max={max} step={step}
+             onChange={(e) => onChange(clamp(Number(e.target.value)))} />
+      {unit && <span className="twk-num-unit">{unit}</span>}
+    </div>
+  );
+}
+
+// Relative-luminance contrast pick — checkmarks drawn over a swatch need to
+// read on both #111 and #fafafa without per-option configuration. Hex input
+// only (#rgb / #rrggbb); named or rgb()/hsl() colors fall through to "light".
+function __twkIsLight(hex) {
+  const h = String(hex).replace('#', '');
+  const x = h.length === 3 ? h.replace(/./g, (c) => c + c) : h.padEnd(6, '0');
+  const n = parseInt(x.slice(0, 6), 16);
+  if (Number.isNaN(n)) return true;
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return r * 299 + g * 587 + b * 114 > 148000;
+}
+
+const __TwkCheck = ({ light }) => (
+  <svg viewBox="0 0 14 14" aria-hidden="true">
+    <path d="M3 7.2 5.8 10 11 4.2" fill="none" strokeWidth="2.2"
+          strokeLinecap="round" strokeLinejoin="round"
+          stroke={light ? 'rgba(0,0,0,.78)' : '#fff'} />
+  </svg>
+);
+
+// TweakColor — curated color/palette picker. Each option is either a single
+// hex string or an array of 1-5 hex strings; the card adapts — a lone color
+// renders solid, a palette renders colors[0] as the hero (left ~2/3) with the
+// rest stacked in a sharp column on the right. onChange emits the
+// option in the shape it was passed (string stays string, array stays array).
+// Without options it falls back to the native color input for back-compat.
+function TweakColor({ label, value, options, onChange }) {
+  if (!options || !options.length) {
+    return (
+      <div className="twk-row twk-row-h">
+        <div className="twk-lbl"><span>{label}</span></div>
+        <input type="color" className="twk-swatch" value={value}
+               onChange={(e) => onChange(e.target.value)} />
+      </div>
+    );
+  }
+  // Native <input type=color> emits lowercase hex per the HTML spec, so
+  // compare case-insensitively. String() guards JSON.stringify(undefined),
+  // which returns the primitive undefined (no .toLowerCase).
+  const key = (o) => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return (
+    <TweakRow label={label}>
+      <div className="twk-chips" role="radiogroup">
+        {options.map((o, i) => {
+          const colors = Array.isArray(o) ? o : [o];
+          const [hero, ...rest] = colors;
+          const sup = rest.slice(0, 4);
+          const on = key(o) === cur;
+          return (
+            <button key={i} type="button" className="twk-chip" role="radio"
+                    aria-checked={on} data-on={on ? '1' : '0'}
+                    aria-label={colors.join(', ')} title={colors.join(' · ')}
+                    style={{ background: hero }}
+                    onClick={() => onChange(o)}>
+              {sup.length > 0 && (
+                <span>
+                  {sup.map((c, j) => <i key={j} style={{ background: c }} />)}
+                </span>
+              )}
+              {on && <__TwkCheck light={__twkIsLight(hero)} />}
+            </button>
+          );
+        })}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakButton({ label, onClick, secondary = false }) {
+  return (
+    <button type="button" className={secondary ? 'twk-btn secondary' : 'twk-btn'}
+            onClick={onClick}>{label}</button>
+  );
+}
+
+Object.assign(window, {
+  useTweaks, TweaksPanel, TweakSection, TweakRow,
+  TweakSlider, TweakToggle, TweakRadio, TweakSelect,
+  TweakText, TweakNumber, TweakColor, TweakButton,
+});
+
+</script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef } = React;
+
+// Mock Data - Seoul Hotspots
+const MOCK_SPOTS = [
+    {
+        id: 1,
+        name: "Seongsu Cafe Street",
+        category: "Cafe",
+        location: "Seongsu-dong",
+        address: "123 Seongsu-ro, Seongdong-gu, Seoul",
+        pins: 1247,
+        trending: true,
+        pinned: false,
+        image: "linear-gradient(135deg, #F56E6E 0%, #F04040 60%, #8C1818 100%)",
+        lat: 37.544,
+        lng: 127.056,
+        description: "Trendy cafe street in Seongsu with industrial-chic vibes",
+    },
+    {
+        id: 2,
+        name: "Ikseon-dong Hanok Village",
+        category: "Culture",
+        location: "Ikseon-dong",
+        address: "56 Ikseon-ro, Jongno-gu, Seoul",
+        pins: 892,
+        trending: true,
+        pinned: false,
+        image: "linear-gradient(135deg, #7AB0EE 0%, #4A8FE0 60%, #1A3580 100%)",
+        lat: 37.571,
+        lng: 126.991,
+        description: "Traditional Korean houses turned into hip cafes",
+    },
+    {
+        id: 3,
+        name: "Hongdae Shopping Street",
+        category: "Shopping",
+        location: "Hongdae",
+        address: "Hongik-ro, Mapo-gu, Seoul",
+        pins: 2134,
+        trending: false,
+        pinned: true,
+        image: "linear-gradient(135deg, #F8CE60 0%, #F5B820 60%, #965800 100%)",
+        lat: 37.556,
+        lng: 126.924,
+        description: "Youth culture hub with street performances",
+    },
+    {
+        id: 4,
+        name: "Common Ground",
+        category: "Shopping",
+        location: "Gwangjin-gu",
+        address: "200 Achasan-ro, Gwangjin-gu, Seoul",
+        pins: 1567,
+        trending: true,
+        pinned: false,
+        image: "linear-gradient(135deg, #E8E6E1 0%, #6b7684 60%, #111318 100%)",
+        lat: 37.544,
+        lng: 127.070,
+        description: "Korea's first pop-up store made of containers",
+    },
+    {
+        id: 5,
+        name: "Mangwon Market",
+        category: "Food",
+        location: "Mangwon-dong",
+        address: "14 Poeun-ro 8-gil, Mapo-gu, Seoul",
+        pins: 734,
+        trending: false,
+        pinned: false,
+        image: "linear-gradient(135deg, #F56E6E 0%, #F04040 60%, #8C1818 100%)",
+        lat: 37.556,
+        lng: 126.906,
+        description: "Local market with authentic Korean street food",
+    },
+    {
+        id: 6,
+        name: "Starfield Library",
+        category: "Culture",
+        location: "Gangnam",
+        address: "513 Yeongdong-daero, Gangnam-gu, Seoul",
+        pins: 2891,
+        trending: true,
+        pinned: true,
+        image: "linear-gradient(135deg, #7AB0EE 0%, #4A8FE0 60%, #1A3580 100%)",
+        lat: 37.512,
+        lng: 127.059,
+        description: "Stunning library in COEX Mall - Instagram paradise",
+    },
+    {
+        id: 7,
+        name: "Bukchon Hanok Village",
+        category: "Culture",
+        location: "Jongno-gu",
+        address: "37 Gyedong-gil, Jongno-gu, Seoul",
+        pins: 1456,
+        trending: false,
+        pinned: false,
+        image: "linear-gradient(135deg, #F8CE60 0%, #F5B820 60%, #965800 100%)",
+        lat: 37.582,
+        lng: 126.985,
+        description: "Traditional village with preserved hanok houses",
+    },
+    {
+        id: 8,
+        name: "Gangnam Underground",
+        category: "Shopping",
+        location: "Gangnam",
+        address: "Gangnam-daero, Seocho-gu, Seoul",
+        pins: 623,
+        trending: false,
+        pinned: false,
+        image: "linear-gradient(135deg, #E8E6E1 0%, #6b7684 60%, #111318 100%)",
+        lat: 37.497,
+        lng: 127.028,
+        description: "Underground mall with affordable K-fashion",
+    },
+];
+
+const REGIONS = [
+    { id: 'seoul',    name: '서울', nameEn: 'Seoul',     tag: '#Metropolitan City',  color: 'linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%)' },
+    { id: 'busan',    name: '부산', nameEn: 'Busan',     tag: '#Ocean City',          color: 'linear-gradient(135deg,#0077b6 0%,#00b4d8 60%,#90e0ef 100%)' },
+    { id: 'jeju',     name: '제주', nameEn: 'Jeju',      tag: '#Nature Paradise',     color: 'linear-gradient(135deg,#2d6a4f 0%,#40916c 60%,#74c69d 100%)' },
+    { id: 'gangneung',name: '강릉', nameEn: 'Gangneung', tag: '#Beach & Coffee',      color: 'linear-gradient(135deg,#48cae4 0%,#0096c7 60%,#023e8a 100%)' },
+    { id: 'jeonju',   name: '전주', nameEn: 'Jeonju',    tag: '#Hanok & Food',        color: 'linear-gradient(135deg,#bc6c25 0%,#dda15e 60%,#ffddd2 100%)' },
+    { id: 'gyeongju', name: '경주', nameEn: 'Gyeongju',  tag: '#Ancient Capital',     color: 'linear-gradient(135deg,#7b2d8b 0%,#c77dff 60%,#e0aaff 100%)' },
+];
+
+const TRENDING_CATEGORIES = [
+    { id: 'hot', label: 'Hot Place', icon: '🔥' },
+    { id: 'rising', label: 'Rising', icon: '🌟' },
+    { id: 'kpop', label: 'K-POP', icon: '🎤' },
+    { id: 'cafe', label: 'Cafe', icon: '☕' },
+    { id: 'food', label: 'Food', icon: '🍜' },
+    { id: 'photo', label: 'Photo', icon: '📸' },
+    { id: 'shopping', label: 'Shopping', icon: '🛍️' },
+    { id: 'culture', label: 'Culture', icon: '🏛️' },
+    { id: 'nightlife', label: 'Nightlife', icon: '🌙' },
+    { id: 'nature', label: 'Nature', icon: '🌳' },
+];
+
+const CATEGORIES = ['All', 'Cafe', 'Food', 'Shopping', 'Culture', 'Nightlife'];
+
+const CATEGORY_ICONS = {
+    'All': '🗺️',
+    'Cafe': '☕',
+    'Food': '🍜',
+    'Shopping': '🛍️',
+    'Culture': '🏛️',
+    'Nightlife': '🌙',
+};
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "markerSize": 40,
+    "currentScreen": "map",
+    "isLoggedIn": false
+}/*EDITMODE-END*/;
+
+// K-Culture Official Brand Colors (Fixed)
+const BRAND_COLORS = {
+    primary: '#F04040',      // Attraction Coral
+    secondary: '#4A8FE0',    // Museum Light
+    tertiary: '#F5B820',     // Screen Yellow
+};
+
+function MapApp() {
+    const [activeCategory, setActiveCategory] = useState('All');
+    const [spots, setSpots] = useState(MOCK_SPOTS);
+    const [selectedSpot, setSelectedSpot] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [myLocation, setMyLocation] = useState(false);
+    const [editingSpot, setEditingSpot] = useState(null);
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [scopeTab, setScopeTab] = useState('nearby');
+    const [activeTrending, setActiveTrending] = useState('hot');
+    const [sidebarNav, setSidebarNav] = useState('info');
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+    const handlePin = (spotId) => {
+        setSpots(spots.map(spot => 
+            spot.id === spotId 
+                ? { ...spot, pinned: !spot.pinned, pins: spot.pinned ? spot.pins - 1 : spot.pins + 1 }
+                : spot
+        ));
+    };
+
+    const filteredSpots = spots.filter(spot => {
+        const matchesCategory = activeCategory === 'All' || spot.category === activeCategory;
+        const matchesSearch = spot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            spot.location.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+
+    const sortedSpots = [...filteredSpots].sort((a, b) => b.pins - a.pins);
+
+    const handleDeleteSpot = (spotId) => {
+        if (confirm('Delete this spot?')) {
+            setSpots(spots.filter(s => s.id !== spotId));
+            setSelectedSpot(null);
+        }
+    };
+
+    const handleSaveSpot = (spotData) => {
+        if (editingSpot) {
+            setSpots(spots.map(s => s.id === editingSpot.id ? { ...s, ...spotData } : s));
+            setEditingSpot(null);
+        } else {
+            const newSpot = {
+                ...spotData,
+                id: Math.max(...spots.map(s => s.id)) + 1,
+                pins: 0,
+                pinned: false,
+                trending: false,
+            };
+            setSpots([...spots, newSpot]);
+            setShowCreateForm(false);
+        }
+    };
+
+    // Screen routing
+    if (t.currentScreen === 'login') {
+        return <LoginScreen t={t} setTweak={setTweak} />;
+    }
+    if (t.currentScreen === 'profile') {
+        return <ProfileScreen t={t} setTweak={setTweak} spots={spots} setSelectedSpot={setSelectedSpot} />;
+    }
+
+    return (
+        <div className="map-container">
+            {/* Map View */}
+            <div className="map-view">
+                {/* Simulated Map Background with Markers */}
+                {filteredSpots.map((spot, idx) => (
+                    <div
+                        key={spot.id}
+                        className={`marker ${spot.trending ? 'trending' : ''} ${selectedSpot && selectedSpot.id === spot.id ? 'selected' : ''}`}
+                        style={{
+                            left: `${30 + (idx % 4) * 17}%`,
+                            top: `${28 + Math.floor(idx / 4) * 22}%`,
+                        }}
+                        onClick={() => setSelectedSpot(spot)}
+                        title={spot.name}
+                    >
+                        <div className="marker-pin">
+                            <div className="marker-photo">
+                                <div
+                                    className="marker-photo-inner"
+                                    style={{ background: spot.image }}
+                                />
+                            </div>
+                            <div className="marker-tail" />
+                        </div>
+                    </div>
+                ))}
+                
+                {/* Map Placeholder Text */}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: 'white',
+                    fontSize: '14px',
+                    opacity: 0.6,
+                    textAlign: 'center',
+                    pointerEvents: 'none',
+                }}>
+                    Google Maps Integration<br/>
+                    <span style={{ fontSize: '12px' }}>Click markers or sidebar items</span>
+                </div>
+            </div>
+
+            {/* Sidebar Panel */}
+            <div className={`sidebar-panel ${sidebarCollapsed ? 'collapsed' : ''}`}>
+                <div className="sidebar-inner">
+
+                {/* Scope Tabs - Segmented Control */}
+                <div className="scope-tabs">
+                    <div className="scope-tabs-inner">
+                        <button
+                            className={`scope-tab ${scopeTab === 'nearby' ? 'active' : ''}`}
+                            onClick={() => setScopeTab('nearby')}
+                        >
+                            <span className="tab-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <line x1="12" y1="2" x2="12" y2="6"/>
+                                    <line x1="12" y1="18" x2="12" y2="22"/>
+                                    <line x1="2" y1="12" x2="6" y2="12"/>
+                                    <line x1="18" y1="12" x2="22" y2="12"/>
+                                </svg>
+                            </span>
+                            <span>Near you</span>
+                        </button>
+                        <button
+                            className={`scope-tab ${scopeTab === 'nationwide' ? 'active' : ''}`}
+                            onClick={() => setScopeTab('nationwide')}
+                        >
+                            <span className="tab-icon">🔥</span>
+                            <span>Nationwide</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="sidebar-scroll">
+                    {sidebarNav === 'info' && scopeTab === 'nationwide' && (
+                        <>
+                            <div className="section-header">
+                                <div className="section-title">
+                                    Trending in Korea
+                                    <span style={{ display:'inline-flex',width:16,height:16,borderRadius:'50%',background:'var(--neutral-paper)',color:'var(--text-secondary)',fontSize:10,alignItems:'center',justifyContent:'center',fontWeight:'var(--font-weight-medium)' }}>i</span>
+                                </div>
+                                <div className="update-indicator">
+                                    <span className="update-dot"/>
+                                    <span>Updated 20m ago</span>
+                                </div>
+                            </div>
+                            <div className="region-grid">
+                                {REGIONS.map((region, idx) => (
+                                    <div key={region.id} className="region-card-wrap">
+                                        <div className="region-bubble">{region.tag}</div>
+                                        <div className="region-squircle">
+                                            <div className="region-squircle-img" style={{ background: region.color }} />
+                                            <div className="region-squircle-overlay" />
+                                            <div className="region-squircle-rank">{idx + 1}</div>
+                                            <div className="region-squircle-name">{region.name}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {sidebarNav === 'info' && scopeTab === 'nearby' && (
+                        <>
+                            {/* Section Header */}
+                            <div className="section-header">
+                                <div className="section-title">
+                                    Trending nearby
+                                    <span style={{ display:'inline-flex',width:16,height:16,borderRadius:'50%',background:'var(--neutral-paper)',color:'var(--text-secondary)',fontSize:10,alignItems:'center',justifyContent:'center',fontWeight:'var(--font-weight-medium)' }}>i</span>
+                                </div>
+                                <div className="update-indicator">
+                                    <span className="update-dot"/>
+                                    <span>Updated 20m ago</span>
+                                </div>
+                            </div>
+
+                            {/* Add new spot button for logged in users */}
+                            {t.isLoggedIn && (
+                                <div style={{ padding: '0 var(--spacing-xl) var(--spacing-lg)' }}>
+                                    <button
+                                        onClick={() => setShowCreateForm(true)}
+                                        style={{
+                                            width: '100%',
+                                            padding: 'var(--spacing-md)',
+                                            background: 'var(--primary)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: 'var(--radius-md)',
+                                            fontSize: 'var(--font-size-body)',
+                                            fontWeight: 'var(--font-weight-semibold)',
+                                            cursor: 'pointer',
+                                            fontFamily: 'inherit',
+                                        }}
+                                    >
+                                        + Add new spot
+                                    </button>
+                                </div>
+                            )}
+                            {/* Ranked Cards 2x2 */}
+                            <div className="ranked-grid">
+                                {sortedSpots.slice(0, 4).map((spot, idx) => (
+                                    <div
+                                        key={spot.id}
+                                        className="ranked-card"
+                                        onClick={() => setSelectedSpot(spot)}
+                                    >
+                                        <div className="ranked-card-img" style={{ background: spot.image }} />
+                                        <div className="ranked-card-overlay" />
+                                        <div className="ranked-card-number">{idx + 1}</div>
+                                        <div className="ranked-card-hashtag">
+                                            #{spot.category}
+                                        </div>
+                                        <button
+                                            className="ranked-card-menu"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (t.isLoggedIn) setEditingSpot(spot);
+                                            }}
+                                            title="More"
+                                        >
+                                            ⋯
+                                        </button>
+                                        <div className="ranked-card-footer">
+                                            <div className="ranked-card-info">
+                                                <div className="ranked-card-name">{spot.name}</div>
+                                                <div className="ranked-card-distance">
+                                                    {(0.2 + idx * 0.8).toFixed(1)}km · {spot.location}
+                                                </div>
+                                            </div>
+                                            <div className="ranked-card-actions">
+                                                <button
+                                                    className={`ranked-card-star ${spot.pinned ? 'starred' : ''}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handlePin(spot.id);
+                                                    }}
+                                                    title={spot.pinned ? 'Unpin' : 'Pin'}
+                                                >
+                                                    {spot.pinned ? '★' : '☆'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            {/* Show more button */}
+                            {sortedSpots.length > 4 && (
+                                <button className="show-more-btn">
+                                    <span>Show 5–{Math.min(10, sortedSpots.length)} more</span>
+                                    <span style={{ fontSize: '10px' }}>▼</span>
+                                </button>
+                            )}
+
+                            {/* Second Section — Rising Spots */}
+                            <div className="section-header" style={{ marginTop: 'var(--spacing-md)' }}>
+                                <div className="section-title">
+                                    Trending Same Nationality
+                                    <span style={{ display:'inline-flex',width:16,height:16,borderRadius:'50%',background:'var(--neutral-paper)',color:'var(--text-secondary)',fontSize:10,alignItems:'center',justifyContent:'center',fontWeight:'var(--font-weight-medium)' }}>i</span>
+                                </div>
+                                <div className="update-indicator">
+                                    <span className="update-dot" style={{ background: 'var(--tertiary)' }}/>
+                                    <span style={{ color: 'var(--tertiary)' }}>Live</span>
+                                </div>
+                            </div>
+                            <div className="ranked-grid">
+                                {[...sortedSpots].reverse().slice(0, 4).map((spot, idx) => (
+                                    <div
+                                        key={`rising-${spot.id}`}
+                                        className="ranked-card"
+                                        onClick={() => setSelectedSpot(spot)}
+                                    >
+                                        <div className="ranked-card-img" style={{ background: spot.image }} />
+                                        <div className="ranked-card-overlay" />
+                                        <div className="ranked-card-number" style={{ color: 'var(--tertiary)' }}>{idx + 1}</div>
+                                        <div className="ranked-card-hashtag">#{spot.category}</div>
+                                        <button
+                                            className="ranked-card-menu"
+                                            onClick={(e) => { e.stopPropagation(); if (t.isLoggedIn) setEditingSpot(spot); }}
+                                        >⋯</button>
+                                        <div className="ranked-card-footer">
+                                            <div className="ranked-card-info">
+                                                <div className="ranked-card-name">{spot.name}</div>
+                                                <div className="ranked-card-distance">
+                                                    {(0.3 + idx * 0.6).toFixed(1)}km · {spot.location}
+                                                </div>
+                                            </div>
+                                            <div className="ranked-card-actions">
+                                                <button
+                                                    className={`ranked-card-star ${spot.pinned ? 'starred' : ''}`}
+                                                    onClick={(e) => { e.stopPropagation(); handlePin(spot.id); }}
+                                                >
+                                                    {spot.pinned ? '★' : '☆'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Show more button 2 */}
+                            <button className="show-more-btn">
+                                <span>Show 5–{Math.min(10, sortedSpots.length)} more</span>
+                                <span style={{ fontSize: '10px' }}>▼</span>
+                            </button>
+                        </>
+                    )}
+
+                    {sidebarNav === 'pick' && (
+                        <div className="pick-empty">
+                            {spots.filter(s => s.pinned).length === 0 ? (
+                                <>
+                                    <span style={{ fontSize: '48px' }}>⭐</span>
+                                    <div style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-headline)' }}>
+                                        No picks yet
+                                    </div>
+                                    <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-body)', lineHeight: 1.6 }}>
+                                        Star spots you love to save them here
+                                    </div>
+                                </>
+                            ) : (
+                                <div style={{ width: '100%' }}>
+                                    <div style={{ padding: '0 0 var(--spacing-lg)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-headline)' }}>
+                                        My Picks ({spots.filter(s => s.pinned).length})
+                                    </div>
+                                    {spots.filter(s => s.pinned).map(spot => (
+                                        <div
+                                            key={spot.id}
+                                            onClick={() => setSelectedSpot(spot)}
+                                            style={{
+                                                display: 'flex',
+                                                gap: 'var(--spacing-md)',
+                                                padding: 'var(--spacing-md)',
+                                                background: 'var(--bg-secondary)',
+                                                borderRadius: 'var(--radius-md)',
+                                                marginBottom: 'var(--spacing-sm)',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-sm)', background: spot.image, flexShrink: 0 }} />
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', marginBottom: 2 }}>{spot.name}</div>
+                                                <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-caption)' }}>{spot.location}</div>
+                                                <div style={{ color: 'var(--tertiary)', fontSize: 'var(--font-size-label)', marginTop: 4 }}>★ {spot.pins}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {sidebarNav === 'lifestyle' && (
+                        <div>
+                            <div className="section-header">
+                                <div className="section-title">K-Life Styles</div>
+                            </div>
+                            <div className="lifestyle-grid">
+                                {[
+                                    { label: 'Cafe Tour', title: 'Seongsu\nCafe Hop', color: 'linear-gradient(135deg,#667eea,#764ba2)' },
+                                    { label: 'Photo Spot', title: 'Golden\nHour Picks', color: 'linear-gradient(135deg,#f093fb,#f5576c)' },
+                                    { label: 'K-Night', title: 'Hongdae\nNight Out', color: 'linear-gradient(135deg,#30cfd0,#330867)' },
+                                    { label: 'Street Food', title: 'Local\nStreet Eats', color: 'linear-gradient(135deg,#fa709a,#fee140)' },
+                                    { label: 'K-Culture', title: 'Hanok &\nModern Mix', color: 'linear-gradient(135deg,#43e97b,#38f9d7)' },
+                                    { label: 'Weekend', title: 'Day Trip\nCourse', color: 'linear-gradient(135deg,#4facfe,#00f2fe)' },
+                                ].map((item, i) => (
+                                    <div key={i} className="lifestyle-card" style={{ background: item.color }}>
+                                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)' }} />
+                                        <div className="lifestyle-card-label">{item.label}</div>
+                                        <div className="lifestyle-card-title">{item.title}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {sidebarNav === 'my' && (
+                        <div style={{ padding: 'var(--spacing-xl)' }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 'var(--spacing-lg)',
+                                padding: 'var(--spacing-xl)',
+                                background: 'var(--bg-secondary)',
+                                borderRadius: 'var(--radius-lg)',
+                                marginBottom: 'var(--spacing-xl)',
+                            }}>
+                                <div style={{
+                                    width: 56, height: 56,
+                                    borderRadius: '50%',
+                                    background: t.isLoggedIn ? 'var(--primary)' : 'var(--neutral-paper)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: 28, flexShrink: 0,
+                                }}>
+                                    {t.isLoggedIn ? '👤' : '🔐'}
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-headline)', marginBottom: 4 }}>
+                                        {t.isLoggedIn ? 'Demo User' : 'Guest'}
+                                    </div>
+                                    <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--text-secondary)' }}>
+                                        {t.isLoggedIn ? 'demo@kspot.com' : 'Sign in to save your spots'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {t.isLoggedIn ? (
+                                <>
+                                    {[
+                                        { icon: '🌍', label: 'Language', value: 'English' },
+                                        { icon: '🏠', label: 'Living in Korea', value: 'Not verified' },
+                                        { icon: '🔔', label: 'Notifications', value: 'On' },
+                                    ].map((item, i) => (
+                                        <div key={i} style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                            padding: 'var(--spacing-lg) 0',
+                                            borderBottom: i < 2 ? '1px solid var(--neutral-paper)' : 'none',
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+                                                <span style={{ fontSize: 18 }}>{item.icon}</span>
+                                                <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{item.label}</span>
+                                            </div>
+                                            <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-caption)' }}>{item.value}</span>
+                                        </div>
+                                    ))}
+                                    <button
+                                        onClick={() => setTweak({ isLoggedIn: false })}
+                                        style={{
+                                            width: '100%', marginTop: 'var(--spacing-xl)',
+                                            padding: 'var(--spacing-md)', background: 'transparent',
+                                            color: '#dc2626', border: '1px solid #dc2626',
+                                            borderRadius: 'var(--radius-md)', fontSize: 'var(--font-size-body)',
+                                            fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: 'inherit',
+                                        }}
+                                    >
+                                        Sign out
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => setTweak('currentScreen', 'login')}
+                                    style={{
+                                        width: '100%', padding: 'var(--spacing-lg)',
+                                        background: 'var(--primary)', color: 'white',
+                                        border: 'none', borderRadius: 'var(--radius-md)',
+                                        fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-semibold)',
+                                        cursor: 'pointer', fontFamily: 'inherit',
+                                    }}
+                                >
+                                    Sign in to K●SPOT
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Bottom Navigation */}
+                <div className="sidebar-bottom-nav">
+                    {[
+                        { id: 'info',      icon: '🗺️',  label: 'Info' },
+                        { id: 'pick',      icon: '⭐',   label: 'Pick' },
+                        { id: 'lifestyle', icon: '✨',   label: 'Life Style' },
+                        { id: 'my',        icon: '👤',   label: 'My' },
+                    ].map(nav => (
+                        <button
+                            key={nav.id}
+                            className={`sidebar-nav-item ${sidebarNav === nav.id ? 'active' : ''}`}
+                            onClick={() => setSidebarNav(nav.id)}
+                        >
+                            <span className="sidebar-nav-icon">{nav.icon}</span>
+                            <span className="sidebar-nav-label">{nav.label}</span>
+                        </button>
+                    ))}
+                </div>{/* end sidebar-bottom-nav */}
+                </div>{/* end sidebar-inner */}
+            </div>{/* end sidebar-panel */}
+
+            {/* Toggle button — independent, always visible */}
+            <button
+                className={`sidebar-toggle ${sidebarCollapsed ? 'collapsed' : ''}`}
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                title={sidebarCollapsed ? 'Open panel' : 'Close panel'}
+            >
+                <span className="toggle-chevron">
+                    {sidebarCollapsed ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                    )}
+                </span>
+            </button>
+            <div className={`top-bar ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+                <div className="top-bar-search">
+                    <div className="search-bar">
+                        <span style={{
+                            fontWeight: 'var(--font-weight-semibold)',
+                            fontSize: 'var(--font-size-headline)',
+                            color: 'var(--primary)',
+                            letterSpacing: '-0.3px',
+                            flexShrink: 0,
+                            cursor: 'pointer',
+                        }}>Picko</span>
+                        <span style={{
+                            width: '1px',
+                            height: '18px',
+                            background: 'var(--neutral-paper)',
+                            flexShrink: 0,
+                        }} />
+                        <input
+                            type="text"
+                            className="search-input"
+                            placeholder="Search spots, areas, hashtags"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <button
+                            className="search-menu-btn"
+                            style={{ color: 'var(--text-secondary)' }}
+                            title="Voice search"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Horizontal Category Chips */}
+                <div className="category-bar">
+                    {TRENDING_CATEGORIES.map(cat => (
+                        <button
+                            key={cat.id}
+                            className={`category-chip ${activeTrending === cat.id ? 'active' : ''}`}
+                            onClick={() => setActiveTrending(cat.id)}
+                        >
+                            <span className="category-chip-icon">{cat.icon}</span>
+                            <span>{cat.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Map Controls */}
+            <div className={`map-controls ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+                <button
+                    className={`control-btn ${myLocation ? 'active' : ''}`}
+                    onClick={() => setMyLocation(!myLocation)}
+                    title="My Location"
+                >
+                    📍
+                </button>
+                <button
+                    className="control-btn"
+                    title="Zoom In"
+                >
+                    ➕
+                </button>
+                <button
+                    className="control-btn"
+                    title="Zoom Out"
+                >
+                    ➖
+                </button>
+            </div>
+
+            {/* Floating Detail Card */}
+            <div className={`detail-card ${selectedSpot ? '' : 'hidden'}`}>
+                {selectedSpot && (
+                    <>
+                        <div className="detail-header" style={{ background: selectedSpot.image }}>
+                            <button className="detail-close" onClick={() => setSelectedSpot(null)}>
+                                ✕
+                            </button>
+                        </div>
+                        <div className="detail-body">
+                            <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                                <span className="badge" style={{ fontSize: 'var(--font-size-label)' }}>
+                                    {selectedSpot.category}
+                                </span>
+                            </div>
+                            <h3 style={{ 
+                                fontSize: 'var(--font-size-headline)', 
+                                fontWeight: 700, 
+                                marginBottom: 'var(--spacing-sm)',
+                            }}>
+                                {selectedSpot.name}
+                            </h3>
+                            <p style={{ 
+                                fontSize: 'var(--font-size-caption)', 
+                                color: 'var(--text-secondary)', 
+                                marginBottom: 'var(--spacing-lg)',
+                                lineHeight: 1.6,
+                            }}>
+                                {selectedSpot.description}
+                            </p>
+                            
+                            <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+                                <div style={{ 
+                                    fontSize: 'var(--font-size-caption)', 
+                                    fontWeight: 600, 
+                                    marginBottom: 'var(--spacing-xs)',
+                                }}>
+                                    📍 Location
+                                </div>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-caption)' }}>
+                                    {selectedSpot.location}
+                                </p>
+                            </div>
+
+                            <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+                                <div style={{ 
+                                    fontSize: 'var(--font-size-caption)', 
+                                    fontWeight: 600, 
+                                    marginBottom: 'var(--spacing-xs)',
+                                }}>
+                                    ❤️ Popularity
+                                </div>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-caption)' }}>
+                                    {selectedSpot.pins} pins
+                                </p>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+                                <button
+                                    style={{
+                                        flex: 1,
+                                        padding: 'var(--spacing-md)',
+                                        background: 'var(--primary)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: 'var(--radius-sm)',
+                                        fontSize: 'var(--font-size-caption)',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => handlePin(selectedSpot.id)}
+                                >
+                                    {selectedSpot.pinned ? '💔 Unpin' : '❤️ Pin'}
+                                </button>
+                                <button
+                                    style={{
+                                        flex: 1,
+                                        padding: 'var(--spacing-md)',
+                                        background: 'var(--bg-secondary)',
+                                        color: 'var(--text-primary)',
+                                        border: 'none',
+                                        borderRadius: 'var(--radius-sm)',
+                                        fontSize: 'var(--font-size-caption)',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    🧭 Go
+                                </button>
+                            </div>
+                            
+                            {t.isLoggedIn && (
+                                <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginTop: 'var(--spacing-md)' }}>
+                                    <button
+                                        onClick={() => setEditingSpot(selectedSpot)}
+                                        style={{
+                                            flex: 1,
+                                            padding: 'var(--spacing-sm)',
+                                            background: 'transparent',
+                                            color: 'var(--text-secondary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: 'var(--radius-sm)',
+                                            fontSize: 'var(--font-size-caption)',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        ✏️ Edit
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteSpot(selectedSpot.id)}
+                                        style={{
+                                            flex: 1,
+                                            padding: 'var(--spacing-sm)',
+                                            background: 'transparent',
+                                            color: '#dc2626',
+                                            border: '1px solid #dc2626',
+                                            borderRadius: 'var(--radius-sm)',
+                                            fontSize: 'var(--font-size-caption)',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
+
+            {/* Create/Edit Form Modal */}
+            {(showCreateForm || editingSpot) && (
+                <SpotFormModal
+                    spot={editingSpot}
+                    onSave={handleSaveSpot}
+                    onClose={() => {
+                        setShowCreateForm(false);
+                        setEditingSpot(null);
+                    }}
+                />
+            )}
+
+            {/* Tweaks Panel */}
+            <TweaksPanel title="Demo Controls">
+                <TweakSection title="Screens">
+                    <TweakRadio
+                        value={t.currentScreen}
+                        onChange={(val) => setTweak('currentScreen', val)}
+                        options={[
+                            { value: 'map', label: 'Map' },
+                            { value: 'login', label: 'Login' },
+                            { value: 'profile', label: 'Profile' },
+                        ]}
+                    />
+                    <TweakToggle
+                        label="Logged In"
+                        value={t.isLoggedIn}
+                        onChange={(val) => setTweak('isLoggedIn', val)}
+                    />
+                </TweakSection>
+
+                <TweakSection title="Map Settings">
+                    <TweakSlider
+                        label="Pin Size"
+                        value={t.markerSize}
+                        onChange={(val) => setTweak('markerSize', val)}
+                        min={30}
+                        max={60}
+                        step={5}
+                        unit="px"
+                    />
+                </TweakSection>
+            </TweaksPanel>
+        </div>
+    );
+}
+
+// ── Login Screen ────────────────────────────────────────────────────────────
+function LoginScreen({ t, setTweak }) {
+    return (
+        <div style={{
+            width: '100%',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        }}>
+            <div style={{
+                width: '400px',
+                background: 'white',
+                borderRadius: 'var(--radius-xl)',
+                padding: 'var(--spacing-3xl)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+                <div style={{
+                    fontSize: 'var(--font-size-display)',
+                    fontWeight: 800,
+                    color: 'var(--primary)',
+                    marginBottom: 'var(--spacing-sm)',
+                    textAlign: 'center',
+                }}>
+                    K-SPOT
+                </div>
+                <p style={{
+                    textAlign: 'center',
+                    color: 'var(--text-secondary)',
+                    marginBottom: 'var(--spacing-3xl)',
+                }}>
+                    Discover & share Korean hotspots
+                </p>
+
+                <button
+                    onClick={() => {
+                        tweaks.setTweak({ isLoggedIn: true, currentScreen: 'map' });
+                    }}
+                    style={{
+                        width: '100%',
+                        padding: 'var(--spacing-lg)',
+                        background: 'black',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: 'var(--font-size-body)',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        marginBottom: 'var(--spacing-md)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 'var(--spacing-md)',
+                    }}
+                >
+                    <span style={{ fontSize: '20px' }}>🍎</span>
+                    Continue with Apple
+                </button>
+
+                <button
+                    onClick={() => {
+                        setTweak({ isLoggedIn: true, currentScreen: 'map' });
+                    }}
+                    style={{
+                        width: '100%',
+                        padding: 'var(--spacing-lg)',
+                        background: 'white',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: 'var(--font-size-body)',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 'var(--spacing-md)',
+                    }}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <div style={{
+                    textAlign: 'center',
+                    marginTop: 'var(--spacing-xl)',
+                }}>
+                    <button
+                        onClick={() => setTweak('currentScreen', 'map')}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'var(--text-secondary)',
+                            fontSize: 'var(--font-size-caption)',
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                        }}
+                    >
+                        Continue as guest
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ── Profile Screen ──────────────────────────────────────────────────────────
+function ProfileScreen({ t, setTweak, spots, setSelectedSpot }) {
+    const myPins = spots.filter(s => s.pinned);
+    
+    return (
+        <div style={{
+            width: '100%',
+            height: '100vh',
+            background: 'var(--bg-secondary)',
+            overflowY: 'auto',
+        }}>
+            <div style={{
+                maxWidth: '800px',
+                margin: '0 auto',
+                padding: 'var(--spacing-3xl) var(--spacing-xl)',
+            }}>
+                {/* Header */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: 'var(--spacing-3xl)',
+                }}>
+                    <button
+                        onClick={() => setTweak('currentScreen', 'map')}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        ←
+                    </button>
+                    <h1 style={{ fontSize: 'var(--font-size-title)', fontWeight: 700 }}>
+                        Profile
+                    </h1>
+                    <div style={{ width: '24px' }} />
+                </div>
+
+                {/* User Info */}
+                <div style={{
+                    background: 'white',
+                    borderRadius: 'var(--radius-xl)',
+                    padding: 'var(--spacing-2xl)',
+                    marginBottom: 'var(--spacing-xl)',
+                    textAlign: 'center',
+                }}>
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '50%',
+                        background: 'var(--primary)',
+                        margin: '0 auto var(--spacing-lg)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '40px',
+                    }}>
+                        👤
+                    </div>
+                    <h2 style={{ fontSize: 'var(--font-size-headline)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--spacing-xs)' }}>
+                        Demo User
+                    </h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-caption)' }}>
+                        demo@kspot.com
+                    </p>
+                </div>
+
+                {/* My Pins */}
+                <div style={{
+                    background: 'white',
+                    borderRadius: 'var(--radius-xl)',
+                    padding: 'var(--spacing-2xl)',
+                    marginBottom: 'var(--spacing-xl)',
+                }}>
+                    <h3 style={{ fontSize: 'var(--font-size-headline)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--spacing-lg)' }}>
+                        My Pins ({myPins.length})
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                        {myPins.map(spot => (
+                            <div
+                                key={spot.id}
+                                onClick={() => {
+                                    setSelectedSpot(spot);
+                                    setTweak('currentScreen', 'map');
+                                }}
+                                style={{
+                                    display: 'flex',
+                                    gap: 'var(--spacing-md)',
+                                    padding: 'var(--spacing-md)',
+                                    background: 'var(--bg-secondary)',
+                                    borderRadius: 'var(--radius-md)',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <div style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    borderRadius: 'var(--radius-sm)',
+                                    background: spot.image,
+                                    flexShrink: 0,
+                                }} />
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontWeight: 600, marginBottom: '4px' }}>{spot.name}</div>
+                                    <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--text-secondary)' }}>
+                                        {spot.location}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {myPins.length === 0 && (
+                            <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: 'var(--spacing-xl)' }}>
+                                No pins yet. Start exploring!
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Logout */}
+                <button
+                    onClick={() => setTweak({ isLoggedIn: false, currentScreen: 'map' })}
+                    style={{
+                        width: '100%',
+                        padding: 'var(--spacing-lg)',
+                        background: 'white',
+                        color: '#dc2626',
+                        border: '1px solid #dc2626',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: 'var(--font-size-body)',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                    }}
+                >
+                    Logout
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// ── Spot Form Modal ─────────────────────────────────────────────────────────
+function SpotFormModal({ spot, onSave, onClose }) {
+    const [formData, setFormData] = useState(spot || {
+        name: '',
+        category: 'Cafe',
+        location: '',
+        address: '',
+        description: '',
+        image: 'linear-gradient(135deg, #F56E6E 0%, #F04040 60%, #8C1818 100%)',
+    });
+
+    return (
+        <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+        }}>
+            <div style={{
+                width: '500px',
+                maxHeight: '80vh',
+                background: 'white',
+                borderRadius: 'var(--radius-xl)',
+                padding: 'var(--spacing-2xl)',
+                overflowY: 'auto',
+            }}>
+                <h2 style={{ fontSize: 'var(--font-size-title)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--spacing-xl)', letterSpacing: '-0.3px' }}>
+                    {spot ? 'Edit Spot' : 'Add New Spot'}
+                </h2>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+                    <div>
+                        <label style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--spacing-xs)' }}>
+                            Name
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            style={{
+                                width: '100%',
+                                padding: 'var(--spacing-md)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-sm)',
+                                fontSize: 'var(--font-size-body)',
+                            }}
+                            placeholder="Spot name"
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--spacing-xs)' }}>
+                            Category
+                        </label>
+                        <select
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            style={{
+                                width: '100%',
+                                padding: 'var(--spacing-md)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-sm)',
+                                fontSize: 'var(--font-size-body)',
+                            }}
+                        >
+                            <option>Cafe</option>
+                            <option>Food</option>
+                            <option>Shopping</option>
+                            <option>Culture</option>
+                            <option>Nightlife</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--spacing-xs)' }}>
+                            Location
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.location}
+                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                            style={{
+                                width: '100%',
+                                padding: 'var(--spacing-md)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-sm)',
+                                fontSize: 'var(--font-size-body)',
+                            }}
+                            placeholder="e.g. Gangnam, Seoul"
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--spacing-xs)' }}>
+                            Address
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.address}
+                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                            style={{
+                                width: '100%',
+                                padding: 'var(--spacing-md)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-sm)',
+                                fontSize: 'var(--font-size-body)',
+                            }}
+                            placeholder="Full address"
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--spacing-xs)' }}>
+                            Description
+                        </label>
+                        <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            style={{
+                                width: '100%',
+                                padding: 'var(--spacing-md)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-sm)',
+                                fontSize: 'var(--font-size-body)',
+                                minHeight: '100px',
+                                resize: 'vertical',
+                            }}
+                            placeholder="What makes this spot special?"
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-lg)' }}>
+                        <button
+                            onClick={onClose}
+                            style={{
+                                flex: 1,
+                                padding: 'var(--spacing-lg)',
+                                background: 'var(--bg-secondary)',
+                                color: 'var(--text-primary)',
+                                border: 'none',
+                                borderRadius: 'var(--radius-md)',
+                                fontSize: 'var(--font-size-body)',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => onSave(formData)}
+                            style={{
+                                flex: 1,
+                                padding: 'var(--spacing-lg)',
+                                background: 'var(--primary)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: 'var(--radius-md)',
+                                fontSize: 'var(--font-size-body)',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                            }}
+                        >
+                            {spot ? 'Save Changes' : 'Create Spot'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<MapApp />);
+
+</script>
+</body>
+</html>
