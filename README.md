@@ -60,8 +60,6 @@ API 문서: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/
 | `docker compose logs -f mysql` | MySQL 로그 스트리밍 |
 | `docker compose restart mysql` | MySQL 컨테이너 재시작 |
 
-> `docker compose down -v` 는 DB 데이터가 삭제되므로 주의한다.
-
 ---
 
 ## 프로젝트 구조
