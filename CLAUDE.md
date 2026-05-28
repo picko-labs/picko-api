@@ -17,15 +17,26 @@ K-SPOT 서비스의 백엔드 API 서버.
 
 ## 패키지 구조
 
+Bounded Context 기반 DDD 구조. 각 컨텍스트는 `domain / infrastructure / application / presentation` 으로 구성한다.
+
 ```
 com.picko.api
-├── controller/          # REST 엔드포인트
-├── service/
-│   └── vo/              # 서비스 계층 DTO (Request / Response)
-└── repository/
-    ├── entity/          # JPA Entity
-    │   └── id/          # 복합 PK (@Embeddable)
-    └── dao/             # QueryDSL / 커스텀 쿼리 (필요 시)
+├── common/              # 공통 (BaseEntity, Config)
+├── user/
+├── admin/
+├── spot/
+└── pin/
+```
+
+각 컨텍스트 내부:
+```
+{context}/
+├── domain/              # Entity, VO, Enum, Domain Service
+│   └── vo/              # Value Object
+├── infrastructure/      # Repository
+├── application/         # Application Service (트랜잭션 소유)
+│   └── dto/             # Request / Response DTO
+└── presentation/        # Controller
 ```
 
 ## 빠른 참조
@@ -44,7 +55,16 @@ com.picko.api
 
 ## Rules
 
+@.claude/rules/dev-principles.md
 @.claude/rules/code-conventions.md
 @.claude/rules/database.md
 @.claude/rules/environment.md
 @.claude/rules/git-convention.md
+
+## Rules 관리 원칙
+
+- **기본 상식 제거** — 프레임워크·언어 수준의 일반 지식은 작성하지 않는다. 이 프로젝트의 결정사항만 기록한다.
+- **모듈화 + 파일 참조** — 주제별로 파일을 분리하고 `@import`로 연결한다. 하나의 파일에 모든 것을 담지 않는다.
+- **예시는 필요한 경우에만** — 복잡도·이해도가 높은 경우에만 스니펫을 사용한다. 소스 파일이 존재하면 파일 경로로 참조한다.
+- **500줄 미만 유지** — 초과 시 즉시 검토하고 불필요한 내용을 삭제한다.
+- **명확한 헤딩과 글머리 기호** — 에이전트가 구조를 빠르게 파악할 수 있도록 한다.
