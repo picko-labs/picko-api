@@ -1,7 +1,7 @@
 package com.picko.api.controller;
 
 import com.picko.api.service.UserService;
-import com.picko.api.service.vo.UserServiceDto;
+import com.picko.api.service.dto.UserServiceDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

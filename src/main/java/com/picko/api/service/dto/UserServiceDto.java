@@ -1,4 +1,4 @@
-package com.picko.api.service.vo;
+package com.picko.api.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

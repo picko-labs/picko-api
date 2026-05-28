@@ -2,7 +2,7 @@ package com.picko.api.service;
 
 import com.picko.api.repository.UserRepository;
 import com.picko.api.repository.entity.UserEntity;
-import com.picko.api.service.vo.UserServiceDto;
+import com.picko.api.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
