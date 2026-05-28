@@ -2,13 +2,12 @@ package com.picko.api.spot.domain;
 
 import com.picko.api.admin.domain.AdminEntity;
 import com.picko.api.common.domain.BaseEntity;
+import com.picko.api.spot.domain.vo.Coordinate;
 import com.picko.api.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 /**
  * spots 테이블
@@ -53,13 +52,9 @@ public class SpotEntity extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    /** 위도 (WGS84). 지도 마커 위치 계산에 사용 */
-    @Column(precision = 10, scale = 7)
-    private BigDecimal latitude;
-
-    /** 경도 (WGS84). 지도 마커 위치 계산에 사용 */
-    @Column(precision = 10, scale = 7)
-    private BigDecimal longitude;
+    /** WGS84 좌표 (위도·경도). 지도 마커 위치 계산에 사용 */
+    @Embedded
+    private Coordinate coordinate;
 
     /** 대표 이미지 URL — 마커 썸네일 및 카드 헤더에 사용 */
     @Column(name = "image_url", length = 500)

@@ -36,8 +36,9 @@ public class UserEntity extends BaseEntity {
     private String email;
 
     /** 인증 제공자 (APPLE | GOOGLE | LINE) */
+    @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", nullable = false, length = 20)
-    private String authProvider;
+    private AuthProvider authProvider;
 
     /** OAuth 소셜 로그인 고유 식별자 (subject / UID) */
     @Column(name = "auth_provider_id")
