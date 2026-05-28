@@ -70,6 +70,15 @@ erDiagram
         timestamp   deleted_at           "연결 삭제 일시 (soft delete)"
     }
 
+    user_pin_catagorys {
+        bigint        user_id              PK1 "사용자 (users.id)"
+        bigint        pin_catagory_id      PK2 "핀 카테고리"
+        varchar255    pin_catagory_name        "핀 카테고리명"
+        timestamp     created_at          "등록 일시"
+        timestamp     updated_at          "최종 수정 일시"
+        timestamp     deleted_at          "삭제 일시 (soft delete)"
+    }
+
     user_pins {
         bigint      id          PK  "픽 고유 식별자"
         bigint      user_id     FK  "사용자 (users.id)"
