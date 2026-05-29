@@ -70,10 +70,21 @@ erDiagram
         timestamp   deleted_at           "연결 삭제 일시 (soft delete)"
     }
 
+    user_pin_categorys {
+				bigint        id 		 								PK		"핀 카테고리 고유 식별자"
+        bigint        user_id             FK 	  "사용자 (users.id)"
+        varchar255    name        							"핀 카테고리명"
+				int						order											  "순서"
+        timestamp     created_at          			"등록 일시"
+        timestamp     updated_at         			 	"최종 수정 일시"
+        timestamp     deleted_at         			 	"삭제 일시 (soft delete)"
+    }
+
     user_pins {
-        bigint      id          PK  "픽 고유 식별자"
-        bigint      user_id     FK  "사용자 (users.id)"
-        bigint      spot_id     FK  "장소 (spots.id)"
+        bigint      id          		 	PK  "픽 고유 식별자"
+        bigint      user_id    			FK  "사용자 (users.id)"
+        bigint      spot_id   		    FK  "장소 (spots.id)"
+				bigint			 pin_category_id	FK 	"핀 카테고리 (user_pin_categorys.id)"
         timestamp   created_at      "픽 등록 일시"
         timestamp   updated_at      "픽 수정 일시"
         timestamp   deleted_at      "픽 삭제 일시 (soft delete)"
@@ -109,6 +120,9 @@ erDiagram
     %% users ↔ spots : 유저가 스팟을 픽(북마크)
     users                ||--o{ user_pins                : "픽한 유저"
     spots                ||--o{ user_pins                : "픽된 스팟"
+
+		%% users → user_pin_categorys : 유저의 픽 카테고리
+    users                ||--o{ user_pin_categorys         : "픽 카테고리 등록 유저"
 
     %% spots ↔ spot_categories : 스팟 카테고리 (N개)
     spots                ||--o{ spot_category_mappings   : "카테고리 연결"
