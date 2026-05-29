@@ -151,7 +151,29 @@ CREATE TABLE spot_category_mappings (
   COMMENT='장소 ↔ 카테고리 M:N 연결';
 
 -- ────────────────────────────────────────────────────────────
--- 7. user_pins
+-- 7. user_pin_categories
+--
+-- 목적: 사용자가 직접 정의하는 핀 카테고리 관리
+-- 설명: 사용자가 자신의 핀(북마크)을 분류하는 커스텀 카테고리다.
+--       user_pins.user_pin_category_id 로 연결된다.
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE user_pin_categories (
+    id         BIGINT       NOT NULL AUTO_INCREMENT  COMMENT '핀 카테고리 고유 식별자 (PK)',
+    user_id    BIGINT       NOT NULL                 COMMENT '카테고리를 소유한 사용자 — users.id 참조',
+    name       VARCHAR(255) NOT NULL                 COMMENT '핀 카테고리명',
+    sort_order INT          NOT NULL DEFAULT 0       COMMENT '카테고리 노출 순서 (오름차순 정렬)',
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP             COMMENT '등록 일시',
+    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+                   ON UPDATE CURRENT_TIMESTAMP                             COMMENT '최종 수정 일시',
+    deleted_at TIMESTAMP    NULL                                            COMMENT '삭제 일시 (soft delete)',
+    PRIMARY KEY (id),
+    KEY idx_user_pin_categories_user (user_id),
+    CONSTRAINT fk_user_pin_categories_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='사용자 커스텀 핀 카테고리';
+
+-- ────────────────────────────────────────────────────────────
+-- 8. user_pins
 --
 -- 목적: 사용자의 스팟 픽(북마크) 관계 관리
 -- 설명: 사이드바 Pick 탭 및 프로필 "My Pins" 목록의 데이터 원천이다.
@@ -159,23 +181,26 @@ CREATE TABLE spot_category_mappings (
 --       (user_id, spot_id) 복합 유니크 키로 중복 픽을 방지한다.
 -- ────────────────────────────────────────────────────────────
 CREATE TABLE user_pins (
-    id         BIGINT    NOT NULL AUTO_INCREMENT  COMMENT '픽 고유 식별자 (PK)',
-    user_id    BIGINT    NOT NULL                 COMMENT '픽한 사용자 — users.id 참조',
-    spot_id    BIGINT    NOT NULL                 COMMENT '픽된 장소 — spots.id 참조',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP             COMMENT '픽 등록 일시',
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-                   ON UPDATE CURRENT_TIMESTAMP                          COMMENT '픽 수정 일시',
-    deleted_at TIMESTAMP NULL                                            COMMENT '픽 삭제 일시 (soft delete)',
+    id                   BIGINT    NOT NULL AUTO_INCREMENT  COMMENT '픽 고유 식별자 (PK)',
+    user_id              BIGINT    NOT NULL                 COMMENT '픽한 사용자 — users.id 참조',
+    spot_id              BIGINT    NOT NULL                 COMMENT '픽된 장소 — spots.id 참조',
+    user_pin_category_id BIGINT    NULL                     COMMENT '핀 카테고리 — user_pin_categories.id 참조. NULL이면 미분류',
+    created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP             COMMENT '픽 등록 일시',
+    updated_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                             ON UPDATE CURRENT_TIMESTAMP                          COMMENT '픽 수정 일시',
+    deleted_at           TIMESTAMP NULL                                            COMMENT '픽 삭제 일시 (soft delete)',
     PRIMARY KEY (id),
     UNIQUE KEY uq_user_pins (user_id, spot_id),
-    KEY idx_user_pins_spot (spot_id),
-    CONSTRAINT fk_user_pins_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT fk_user_pins_spot FOREIGN KEY (spot_id) REFERENCES spots (id) ON DELETE CASCADE
+    KEY idx_user_pins_spot         (spot_id),
+    KEY idx_user_pins_pin_category (user_pin_category_id),
+    CONSTRAINT fk_user_pins_user         FOREIGN KEY (user_id)              REFERENCES users              (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_pins_spot         FOREIGN KEY (spot_id)              REFERENCES spots              (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_pins_pin_category FOREIGN KEY (user_pin_category_id) REFERENCES user_pin_categories(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   COMMENT='사용자 ↔ 장소 픽(북마크) 관계 (Pick 탭 / My Pins 데이터 원천)';
 
 -- ────────────────────────────────────────────────────────────
--- 8. spot_hashtags
+-- 9. spot_hashtags
 --
 -- 목적: 지도 상단 가로 스크롤 필터 칩 관리
 -- 설명: Hot Place, Rising, K-POP, Cafe, Food, Photo, Shopping,
@@ -198,7 +223,7 @@ CREATE TABLE spot_hashtags (
   COMMENT='지도 상단 해시태그 필터 (Hot Place / Rising / K-POP 등)';
 
 -- ────────────────────────────────────────────────────────────
--- 9. spot_hashtag_mappings
+-- 10. spot_hashtag_mappings
 --
 -- 목적: 장소와 해시태그의 M:N 연결 관계 관리
 -- 설명: 하나의 스팟이 여러 해시태그에 속할 수 있고,
