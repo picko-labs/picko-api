@@ -3,6 +3,7 @@ package com.picko.api.pin.domain;
 import com.picko.api.common.domain.BaseEntity;
 import com.picko.api.spot.domain.SpotEntity;
 import com.picko.api.user.domain.UserEntity;
+import org.hibernate.annotations.SQLDelete;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "user_pins")
+@SQLDelete(sql = "UPDATE user_pins SET deleted_at = NOW() WHERE id = ?")
 @Getter
 @NoArgsConstructor
 public class UserPinEntity extends BaseEntity {

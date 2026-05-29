@@ -3,6 +3,7 @@ package com.picko.api.spot.domain;
 import com.picko.api.admin.domain.AdminEntity;
 import com.picko.api.common.domain.BaseEntity;
 import com.picko.api.spot.domain.vo.Coordinate;
+import org.hibernate.annotations.SQLDelete;
 import com.picko.api.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "spots")
+@SQLDelete(sql = "UPDATE spots SET deleted_at = NOW() WHERE id = ?")
 @Getter
 @Setter
 @NoArgsConstructor
