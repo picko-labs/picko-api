@@ -37,4 +37,9 @@ public class UserPinEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spot_id", nullable = false)
     private SpotEntity spot;
+
+    /** 핀 카테고리 — user_pin_categories.id 참조. NULL이면 미분류 */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_pin_category_id")
+    private UserPinCategoryEntity userPinCategory;
 }
