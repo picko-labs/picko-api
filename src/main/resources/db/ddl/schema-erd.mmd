@@ -54,8 +54,6 @@ erDiagram
         bigint      id              PK  "장소 고유 식별자"
         varchar255  name                "장소명"
         bigint      spot_address_id FK  "주소 분류 (spot_address.id)"
-        varchar255  location            "동/구 단위 지역명"
-        varchar500  address             "도로명 전체 주소"
         text        description         "장소 소개 문구"
         varchar500  image_url           "대표 이미지 URL"
         tinyint1    is_trending         "트렌딩 강조 여부"
