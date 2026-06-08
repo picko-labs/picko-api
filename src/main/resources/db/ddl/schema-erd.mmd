@@ -24,15 +24,18 @@ erDiagram
     }
 
     spot_address {
-        bigint      id          PK  "주소 고유 식별자"
-        varchar50   code            "주소 코드 (seoul, busan …)"
-        varchar50   name            "한글명 (서울, 부산 …)"
-        varchar100  name_en         "영문명 (Seoul, Busan …)"
-        decimal10_7 latitude        "위도 (WGS84)"
-        decimal10_7 longitude       "경도 (WGS84)"
-        timestamp   created_at      "생성 일시"
-        timestamp   updated_at      "최종 수정 일시"
-        timestamp   deleted_at      "삭제 일시 (soft delete)"
+        bigint      id             PK  "주소 고유 식별자"
+        varchar50   code               "주소 코드 (seoul, busan …)"
+        varchar50   name               "한글명 (서울, 부산 …)"
+        varchar100  name_en            "영문명 (Seoul, Busan …)"
+        varchar10   postal_code        "우편번호"
+        varchar500  address            "기본주소 (도로명/지번 주소)"
+        varchar255  address_detail     "상세주소"
+        decimal10_7 latitude           "위도 (WGS84)"
+        decimal10_7 longitude          "경도 (WGS84)"
+        timestamp   created_at         "생성 일시"
+        timestamp   updated_at         "최종 수정 일시"
+        timestamp   deleted_at         "삭제 일시 (soft delete)"
     }
 
     spot_categories {
