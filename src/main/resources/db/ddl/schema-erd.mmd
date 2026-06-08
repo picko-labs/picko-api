@@ -26,8 +26,9 @@ erDiagram
     spot_address {
         bigint      id             PK  "주소 고유 식별자"
         varchar50   code               "주소 코드 (seoul, busan …)"
-        varchar50   name               "한글명 (서울, 부산 …)"
-        varchar100  name_en            "영문명 (Seoul, Busan …)"
+        varchar100  region             "시/도 (서울특별시, 경기도 …)"
+        varchar100  city               "시/군/구 (강남구, 수원시 …)"
+        varchar100  town               "읍/면/동 (역삼동, 판교읍 …)"
         varchar10   postal_code        "우편번호"
         varchar500  address            "기본주소 (도로명/지번 주소)"
         varchar255  address_detail     "상세주소"
