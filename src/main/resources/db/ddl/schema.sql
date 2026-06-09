@@ -3,6 +3,19 @@
 -- MySQL / InnoDB  |  charset utf8mb4
 -- ============================================================
 
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS spot_hashtag_mappings;
+DROP TABLE IF EXISTS spot_category_mappings;
+DROP TABLE IF EXISTS user_pins;
+DROP TABLE IF EXISTS user_pin_categories;
+DROP TABLE IF EXISTS spots;
+DROP TABLE IF EXISTS spot_hashtags;
+DROP TABLE IF EXISTS spot_categories;
+DROP TABLE IF EXISTS spot_address;
+DROP TABLE IF EXISTS admins;
+DROP TABLE IF EXISTS users;
+
 -- ────────────────────────────────────────────────────────────
 -- 1. users
 --
@@ -244,3 +257,5 @@ CREATE TABLE spot_hashtag_mappings (
     CONSTRAINT fk_shm_spot_hashtag FOREIGN KEY (spot_hashtag_id) REFERENCES spot_hashtags (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   COMMENT='장소 ↔ 해시태그 M:N 연결';
+
+SET FOREIGN_KEY_CHECKS = 1;
