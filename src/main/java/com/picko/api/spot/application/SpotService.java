@@ -25,6 +25,10 @@ public class SpotService {
     private final SpotHashtagMappingRepository hashtagMappingRepository;
     private final UserPinRepository userPinRepository;
 
+    /**
+     * 필터 조건에 맞는 스팟 목록을 반환한다.
+     * 모든 파라미터는 선택적이며 null이면 해당 조건을 무시한다.
+     */
     public List<SpotServiceDto.ListItem> getSpots(
             String addressCode, Boolean isTrending, String categoryCode, String hashtagCode) {
         return spotRepository.findByFilters(addressCode, isTrending, categoryCode, hashtagCode)
@@ -33,12 +37,21 @@ public class SpotService {
                 .toList();
     }
 
+    /**
+     * 스팟 단건 상세 정보를 반환한다.
+     * 존재하지 않는 id면 IllegalArgumentException을 던진다.
+     */
     public SpotServiceDto.Detail getSpot(Long id) {
         SpotEntity spot = spotRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Spot not found: " + id));
         return toDetail(spot);
     }
 
+    /**
+     * 스팟 목록 아이템 DTO로 변환한다.
+     * 좌표는 spotAddress를 통해 접근한다. spotAddress가 미분류(null)이면 좌표도 null로 반환된다.
+     * pinCount는 비정규화하지 않으므로 매 호출마다 user_pins를 집계한다.
+     */
     private SpotServiceDto.ListItem toListItem(SpotEntity spot) {
         List<SpotServiceDto.CategoryInfo> categories = categoryMappingRepository
                 .findByIdSpotId(spot.getId())
@@ -59,6 +72,10 @@ public class SpotService {
                 .build();
     }
 
+    /**
+     * 스팟 상세 DTO로 변환한다.
+     * 목록과 달리 해시태그 정보를 포함하며, 주소 전체 정보(region/city/town/좌표 등)를 AddressInfo에 담아 반환한다.
+     */
     private SpotServiceDto.Detail toDetail(SpotEntity spot) {
         List<SpotServiceDto.CategoryInfo> categories = categoryMappingRepository
                 .findByIdSpotId(spot.getId())
@@ -86,6 +103,7 @@ public class SpotService {
                 .build();
     }
 
+    /** 카테고리 엔티티를 응답 DTO로 변환한다. */
     private SpotServiceDto.CategoryInfo toCategoryInfo(SpotCategoryEntity category) {
         return SpotServiceDto.CategoryInfo.builder()
                 .id(category.getId())
@@ -95,6 +113,7 @@ public class SpotService {
                 .build();
     }
 
+    /** 해시태그 엔티티를 응답 DTO로 변환한다. */
     private SpotServiceDto.HashtagInfo toHashtagInfo(SpotHashtagEntity hashtag) {
         return SpotServiceDto.HashtagInfo.builder()
                 .id(hashtag.getId())
@@ -104,6 +123,10 @@ public class SpotService {
                 .build();
     }
 
+    /**
+     * 주소 엔티티를 응답 DTO로 변환한다.
+     * 좌표는 Coordinate VO에서 꺼내 flat하게 노출한다.
+     */
     private SpotServiceDto.AddressInfo toAddressInfo(SpotAddressEntity address) {
         var coordinate = address.getCoordinate();
         return SpotServiceDto.AddressInfo.builder()
