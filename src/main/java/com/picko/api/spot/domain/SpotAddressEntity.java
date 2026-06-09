@@ -1,6 +1,7 @@
 package com.picko.api.spot.domain;
 
 import com.picko.api.common.domain.BaseEntity;
+import com.picko.api.spot.domain.vo.Coordinate;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import lombok.Getter;
@@ -30,11 +31,31 @@ public class SpotAddressEntity extends BaseEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String code;
 
-    /** 주소 한글 표기명 (예: 서울, 부산, 제주) */
-    @Column(nullable = false, length = 50)
-    private String name;
+    /** 시/도 (예: 서울특별시, 경기도) */
+    @Column(nullable = false, length = 100)
+    private String region;
 
-    /** 주소 영문 표기명 (예: Seoul, Busan, Jeju) */
-    @Column(name = "name_en", nullable = false, length = 100)
-    private String nameEn;
+    /** 시/군/구 (예: 강남구, 수원시) */
+    @Column(length = 100)
+    private String city;
+
+    /** 읍/면/동 (예: 역삼동, 판교읍) */
+    @Column(length = 100)
+    private String town;
+
+    /** 우편번호 */
+    @Column(name = "postal_code", length = 10)
+    private String postalCode;
+
+    /** 기본주소 (도로명/지번 주소) */
+    @Column(length = 500)
+    private String address;
+
+    /** 상세주소 */
+    @Column(name = "address_detail", length = 255)
+    private String addressDetail;
+
+    /** WGS84 좌표 (위도·경도) */
+    @Embedded
+    private Coordinate coordinate;
 }

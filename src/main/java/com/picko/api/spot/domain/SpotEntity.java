@@ -2,7 +2,6 @@ package com.picko.api.spot.domain;
 
 import com.picko.api.admin.domain.AdminEntity;
 import com.picko.api.common.domain.BaseEntity;
-import com.picko.api.spot.domain.vo.Coordinate;
 import org.hibernate.annotations.SQLDelete;
 import com.picko.api.user.domain.UserEntity;
 import jakarta.persistence.*;
@@ -42,21 +41,9 @@ public class SpotEntity extends BaseEntity {
     @JoinColumn(name = "spot_address_id")
     private SpotAddressEntity spotAddress;
 
-    /** 동/구 단위 지역명 (예: Seongsu-dong). 지도 카드 하단 거리 정보에 표시 */
-    @Column(length = 255)
-    private String location;
-
-    /** 도로명 전체 주소 (예: 123 Seongsu-ro, Seongdong-gu, Seoul) */
-    @Column(length = 500)
-    private String address;
-
     /** 장소 소개 문구 — 상세 카드 본문에 표시 */
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    /** WGS84 좌표 (위도·경도). 지도 마커 위치 계산에 사용 */
-    @Embedded
-    private Coordinate coordinate;
 
     /** 대표 이미지 URL — 마커 썸네일 및 카드 헤더에 사용 */
     @Column(name = "image_url", length = 500)
