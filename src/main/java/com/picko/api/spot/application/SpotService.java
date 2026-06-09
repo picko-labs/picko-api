@@ -140,7 +140,6 @@ public class SpotService {
      * 새 스팟을 저장한다.
      * userId / adminId 중 하나만 세팅하며, 둘 다 null이면 배치 등록으로 처리된다.
      */
-    @Transactional
     public SpotServiceDto.Detail createSpot(SpotServiceDto.SpotCreateRequest request) {
         SpotEntity spot = new SpotEntity();
         spot.setName(request.getName());
