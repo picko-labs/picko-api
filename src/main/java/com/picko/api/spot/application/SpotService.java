@@ -46,14 +46,14 @@ public class SpotService {
                 .map(m -> toCategoryInfo(m.getSpotCategory()))
                 .toList();
 
+        var coordinate = spot.getSpotAddress() != null ? spot.getSpotAddress().getCoordinate() : null;
         return SpotServiceDto.ListItem.builder()
                 .id(spot.getId())
                 .name(spot.getName())
-                .location(spot.getLocation())
                 .imageUrl(spot.getImageUrl())
                 .isTrending(spot.getIsTrending())
-                .latitude(spot.getCoordinate() != null ? spot.getCoordinate().getLatitude() : null)
-                .longitude(spot.getCoordinate() != null ? spot.getCoordinate().getLongitude() : null)
+                .latitude(coordinate != null ? coordinate.getLatitude() : null)
+                .longitude(coordinate != null ? coordinate.getLongitude() : null)
                 .categories(categories)
                 .pinCount(userPinRepository.countBySpotIdAndDeletedAtIsNull(spot.getId()))
                 .build();
@@ -75,12 +75,8 @@ public class SpotService {
         return SpotServiceDto.Detail.builder()
                 .id(spot.getId())
                 .name(spot.getName())
-                .location(spot.getLocation())
-                .address(spot.getAddress())
                 .description(spot.getDescription())
                 .isTrending(spot.getIsTrending())
-                .latitude(spot.getCoordinate() != null ? spot.getCoordinate().getLatitude() : null)
-                .longitude(spot.getCoordinate() != null ? spot.getCoordinate().getLongitude() : null)
                 .imageUrl(spot.getImageUrl())
                 .spotAddress(spot.getSpotAddress() != null ? toAddressInfo(spot.getSpotAddress()) : null)
                 .categories(categories)
@@ -109,11 +105,18 @@ public class SpotService {
     }
 
     private SpotServiceDto.AddressInfo toAddressInfo(SpotAddressEntity address) {
+        var coordinate = address.getCoordinate();
         return SpotServiceDto.AddressInfo.builder()
                 .id(address.getId())
                 .code(address.getCode())
-                .name(address.getName())
-                .nameEn(address.getNameEn())
+                .region(address.getRegion())
+                .city(address.getCity())
+                .town(address.getTown())
+                .postalCode(address.getPostalCode())
+                .address(address.getAddress())
+                .addressDetail(address.getAddressDetail())
+                .latitude(coordinate != null ? coordinate.getLatitude() : null)
+                .longitude(coordinate != null ? coordinate.getLongitude() : null)
                 .build();
     }
 }
