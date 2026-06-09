@@ -1,5 +1,6 @@
 package com.picko.api.spot.application;
 
+import com.picko.api.admin.infrastructure.AdminRepository;
 import com.picko.api.pin.infrastructure.UserPinRepository;
 import com.picko.api.spot.application.dto.SpotServiceDto;
 import com.picko.api.spot.domain.SpotAddressEntity;
@@ -14,6 +15,7 @@ import com.picko.api.spot.infrastructure.SpotCategoryMappingRepository;
 import com.picko.api.spot.infrastructure.SpotCategoryRepository;
 import com.picko.api.spot.infrastructure.SpotHashtagMappingRepository;
 import com.picko.api.spot.infrastructure.SpotRepository;
+import com.picko.api.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,8 @@ public class SpotService {
     private final SpotCategoryMappingRepository categoryMappingRepository;
     private final SpotHashtagMappingRepository hashtagMappingRepository;
     private final UserPinRepository userPinRepository;
+    private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
 
     /**
      * 필터 조건에 맞는 스팟 목록을 반환한다.
@@ -128,6 +132,39 @@ public class SpotService {
                 .name(hashtag.getName())
                 .icon(hashtag.getIcon())
                 .build();
+    }
+
+    // ── spots 저장 ────────────────────────────────────────────
+
+    /**
+     * 새 스팟을 저장한다.
+     * userId / adminId 중 하나만 세팅하며, 둘 다 null이면 배치 등록으로 처리된다.
+     */
+    @Transactional
+    public SpotServiceDto.Detail createSpot(SpotServiceDto.SpotCreateRequest request) {
+        SpotEntity spot = new SpotEntity();
+        spot.setName(request.getName());
+        spot.setDescription(request.getDescription());
+        spot.setImageUrl(request.getImageUrl());
+        spot.setIsTrending(request.getIsTrending() != null ? request.getIsTrending() : false);
+
+        if (request.getSpotAddressId() != null) {
+            SpotAddressEntity address = spotAddressRepository.findById(request.getSpotAddressId())
+                    .orElseThrow(() -> new IllegalArgumentException("SpotAddress not found: " + request.getSpotAddressId()));
+            spot.setSpotAddress(address);
+        }
+
+        if (request.getUserId() != null) {
+            spot.setUser(userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + request.getUserId())));
+        }
+
+        if (request.getAdminId() != null) {
+            spot.setAdmin(adminRepository.findById(request.getAdminId())
+                    .orElseThrow(() -> new IllegalArgumentException("Admin not found: " + request.getAdminId())));
+        }
+
+        return toDetail(spotRepository.save(spot));
     }
 
     // ── spot_address CRUD ─────────────────────────────────────

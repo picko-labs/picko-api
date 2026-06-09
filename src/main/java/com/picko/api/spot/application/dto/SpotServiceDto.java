@@ -115,6 +115,20 @@ public class SpotServiceDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class SpotCreateRequest {
+        private String name;
+        private Long spotAddressId;
+        private String description;
+        private String imageUrl;
+        private Boolean isTrending;
+        private Long userId;
+        private Long adminId;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SpotAddressRequest {
         private String code;
         private String region;

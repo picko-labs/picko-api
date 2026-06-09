@@ -36,6 +36,13 @@ public class SpotController {
         return ResponseEntity.ok(spotService.getSpot(id));
     }
 
+    @Operation(summary = "스팟 저장")
+    @PostMapping("/spots")
+    public ResponseEntity<SpotServiceDto.Detail> createSpot(
+            @RequestBody SpotServiceDto.SpotCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(spotService.createSpot(request));
+    }
+
     // ── 주소 ──────────────────────────────────────────────────
 
     @Operation(summary = "주소 목록 조회")
