@@ -57,14 +57,20 @@ CREATE TABLE admins (
 -- 설명: 사이드바 Nationwide 탭의 지역별 트렌딩 카드에 사용된다.
 -- ────────────────────────────────────────────────────────────
 CREATE TABLE spot_address (
-    id         BIGINT       NOT NULL AUTO_INCREMENT  COMMENT '주소 고유 식별자 (PK)',
-    code       VARCHAR(50)  NOT NULL                 COMMENT '주소 코드 — 영문 소문자 (예: seoul, busan, jeju). 프로그래밍 식별자로 사용',
-    name       VARCHAR(50)  NOT NULL                 COMMENT '주소 한글 표기명 (예: 서울, 부산, 제주)',
-    name_en    VARCHAR(100) NOT NULL                 COMMENT '주소 영문 표기명 (예: Seoul, Busan, Jeju)',
-    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP             COMMENT '레코드 생성 일시',
-    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
-                   ON UPDATE CURRENT_TIMESTAMP                             COMMENT '레코드 최종 수정 일시',
-    deleted_at TIMESTAMP    NULL                                            COMMENT '삭제 일시 (soft delete)',
+    id             BIGINT         NOT NULL AUTO_INCREMENT  COMMENT '주소 고유 식별자 (PK)',
+    code           VARCHAR(50)    NOT NULL                 COMMENT '주소 코드 — 영문 소문자 (예: seoul, busan, jeju). 프로그래밍 식별자로 사용',
+    region         VARCHAR(100)   NOT NULL                 COMMENT '시/도 (예: 서울특별시, 경기도)',
+    city           VARCHAR(100)   NULL                     COMMENT '시/군/구 (예: 강남구, 수원시)',
+    town           VARCHAR(100)   NULL                     COMMENT '읍/면/동 (예: 역삼동, 판교읍)',
+    postal_code    VARCHAR(10)    NULL                     COMMENT '우편번호',
+    address        VARCHAR(500)   NULL                     COMMENT '기본주소 (도로명/지번 주소)',
+    address_detail VARCHAR(255)   NULL                     COMMENT '상세주소',
+    latitude       DECIMAL(10, 7) NULL                     COMMENT '위도 (WGS84)',
+    longitude      DECIMAL(10, 7) NULL                     COMMENT '경도 (WGS84)',
+    created_at     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP             COMMENT '레코드 생성 일시',
+    updated_at     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
+                       ON UPDATE CURRENT_TIMESTAMP                               COMMENT '레코드 최종 수정 일시',
+    deleted_at     TIMESTAMP      NULL                                            COMMENT '삭제 일시 (soft delete)',
     PRIMARY KEY (id),
     UNIQUE KEY uq_spot_address_code (code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
@@ -106,11 +112,7 @@ CREATE TABLE spots (
     id              BIGINT          NOT NULL AUTO_INCREMENT  COMMENT '장소 고유 식별자 (PK)',
     name            VARCHAR(255)    NOT NULL                 COMMENT '장소명 (예: Seongsu Cafe Street)',
     spot_address_id BIGINT          NULL                     COMMENT '주소 분류 — spot_address.id 참조. NULL이면 미분류',
-    location        VARCHAR(255)    NULL                     COMMENT '동/구 단위 지역명 (예: Seongsu-dong). 지도 카드 하단 거리 정보에 표시',
-    address         VARCHAR(500)    NULL                     COMMENT '도로명 전체 주소 (예: 123 Seongsu-ro, Seongdong-gu, Seoul)',
     description     TEXT            NULL                     COMMENT '장소 소개 문구 — 상세 카드 본문에 표시',
-    latitude        DECIMAL(10, 7)  NULL                     COMMENT '위도 (WGS84). 지도 마커 위치 계산에 사용',
-    longitude       DECIMAL(10, 7)  NULL                     COMMENT '경도 (WGS84). 지도 마커 위치 계산에 사용',
     image_url       VARCHAR(500)    NULL                     COMMENT '대표 이미지 URL — 마커 썸네일 및 카드 헤더에 사용',
     is_trending     TINYINT(1)      NOT NULL DEFAULT 0       COMMENT '트렌딩 강조 표시 여부 (0: 일반, 1: 트렌딩). 마커 테두리 색상 변경에 반영',
     user_id         BIGINT          NULL                     COMMENT '사용자 등록자 — users.id 참조. 사용자가 등록한 경우에만 세팅',
@@ -122,7 +124,6 @@ CREATE TABLE spots (
     PRIMARY KEY (id),
     KEY idx_spots_spot_address (spot_address_id),
     KEY idx_spots_trending     (is_trending),
-    KEY idx_spots_location     (latitude, longitude),
     CONSTRAINT fk_spots_spot_address FOREIGN KEY (spot_address_id) REFERENCES spot_address (id),
     CONSTRAINT fk_spots_user         FOREIGN KEY (user_id)         REFERENCES users (id),
     CONSTRAINT fk_spots_admin        FOREIGN KEY (admin_id)        REFERENCES admins (id)
