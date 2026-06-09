@@ -1,8 +1,10 @@
 package com.picko.api.spot.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -107,5 +109,32 @@ public class SpotServiceDto {
         private String addressDetail;
         private BigDecimal latitude;
         private BigDecimal longitude;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SpotAddressRequest {
+        private String code;
+        private String region;
+        private String city;
+        private String town;
+        private String postalCode;
+        private String address;
+        private String addressDetail;
+        private BigDecimal latitude;
+        private BigDecimal longitude;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SpotCategoryRequest {
+        private String code;
+        private String name;
+        private String icon;
+        private Integer sortOrder;
     }
 }

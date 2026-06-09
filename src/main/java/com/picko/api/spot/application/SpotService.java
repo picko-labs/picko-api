@@ -4,9 +4,14 @@ import com.picko.api.pin.infrastructure.UserPinRepository;
 import com.picko.api.spot.application.dto.SpotServiceDto;
 import com.picko.api.spot.domain.SpotAddressEntity;
 import com.picko.api.spot.domain.SpotCategoryEntity;
+import com.picko.api.spot.domain.SpotCategoryMappingEntity;
 import com.picko.api.spot.domain.SpotEntity;
 import com.picko.api.spot.domain.SpotHashtagEntity;
+import com.picko.api.spot.domain.id.SpotCategoryMappingId;
+import com.picko.api.spot.domain.vo.Coordinate;
+import com.picko.api.spot.infrastructure.SpotAddressRepository;
 import com.picko.api.spot.infrastructure.SpotCategoryMappingRepository;
+import com.picko.api.spot.infrastructure.SpotCategoryRepository;
 import com.picko.api.spot.infrastructure.SpotHashtagMappingRepository;
 import com.picko.api.spot.infrastructure.SpotRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,8 @@ import java.util.List;
 public class SpotService {
 
     private final SpotRepository spotRepository;
+    private final SpotAddressRepository spotAddressRepository;
+    private final SpotCategoryRepository spotCategoryRepository;
     private final SpotCategoryMappingRepository categoryMappingRepository;
     private final SpotHashtagMappingRepository hashtagMappingRepository;
     private final UserPinRepository userPinRepository;
@@ -122,6 +129,128 @@ public class SpotService {
                 .icon(hashtag.getIcon())
                 .build();
     }
+
+    // ── spot_address CRUD ─────────────────────────────────────
+
+    /** 삭제되지 않은 전체 주소 목록을 반환한다. */
+    public List<SpotServiceDto.AddressInfo> getSpotAddresses() {
+        return spotAddressRepository.findAllByDeletedAtIsNull()
+                .stream()
+                .map(this::toAddressInfo)
+                .toList();
+    }
+
+    /** 새 주소를 생성한다. */
+    @Transactional
+    public SpotServiceDto.AddressInfo createSpotAddress(SpotServiceDto.SpotAddressRequest request) {
+        SpotAddressEntity entity = new SpotAddressEntity();
+        applySpotAddressRequest(entity, request);
+        return toAddressInfo(spotAddressRepository.save(entity));
+    }
+
+    /** 기존 주소를 수정한다. */
+    @Transactional
+    public SpotServiceDto.AddressInfo updateSpotAddress(Long id, SpotServiceDto.SpotAddressRequest request) {
+        SpotAddressEntity entity = spotAddressRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("SpotAddress not found: " + id));
+        applySpotAddressRequest(entity, request);
+        return toAddressInfo(entity);
+    }
+
+    /** 주소를 soft delete한다. */
+    @Transactional
+    public void deleteSpotAddress(Long id) {
+        SpotAddressEntity entity = spotAddressRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("SpotAddress not found: " + id));
+        spotAddressRepository.delete(entity);
+    }
+
+    private void applySpotAddressRequest(SpotAddressEntity entity, SpotServiceDto.SpotAddressRequest request) {
+        entity.setCode(request.getCode());
+        entity.setRegion(request.getRegion());
+        entity.setCity(request.getCity());
+        entity.setTown(request.getTown());
+        entity.setPostalCode(request.getPostalCode());
+        entity.setAddress(request.getAddress());
+        entity.setAddressDetail(request.getAddressDetail());
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            entity.setCoordinate(new Coordinate(request.getLatitude(), request.getLongitude()));
+        }
+    }
+
+    // ── spot_categories CRUD ──────────────────────────────────
+
+    /** 삭제되지 않은 전체 카테고리를 노출 순서대로 반환한다. */
+    public List<SpotServiceDto.CategoryInfo> getSpotCategories() {
+        return spotCategoryRepository.findAllByDeletedAtIsNullOrderBySortOrderAsc()
+                .stream()
+                .map(this::toCategoryInfo)
+                .toList();
+    }
+
+    /** 새 카테고리를 생성한다. */
+    @Transactional
+    public SpotServiceDto.CategoryInfo createSpotCategory(SpotServiceDto.SpotCategoryRequest request) {
+        SpotCategoryEntity entity = new SpotCategoryEntity();
+        applySpotCategoryRequest(entity, request);
+        return toCategoryInfo(spotCategoryRepository.save(entity));
+    }
+
+    /** 기존 카테고리를 수정한다. */
+    @Transactional
+    public SpotServiceDto.CategoryInfo updateSpotCategory(Long id, SpotServiceDto.SpotCategoryRequest request) {
+        SpotCategoryEntity entity = spotCategoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("SpotCategory not found: " + id));
+        applySpotCategoryRequest(entity, request);
+        return toCategoryInfo(entity);
+    }
+
+    /** 카테고리를 soft delete한다. */
+    @Transactional
+    public void deleteSpotCategory(Long id) {
+        SpotCategoryEntity entity = spotCategoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("SpotCategory not found: " + id));
+        spotCategoryRepository.delete(entity);
+    }
+
+    private void applySpotCategoryRequest(SpotCategoryEntity entity, SpotServiceDto.SpotCategoryRequest request) {
+        entity.setCode(request.getCode());
+        entity.setName(request.getName());
+        entity.setIcon(request.getIcon());
+        if (request.getSortOrder() != null) {
+            entity.setSortOrder(request.getSortOrder());
+        }
+    }
+
+    // ── spot_category_mappings CRUD ───────────────────────────
+
+    /**
+     * 스팟에 카테고리를 연결한다.
+     * 이미 연결된 경우 중복 저장을 막기 위해 존재 여부를 먼저 확인한다.
+     */
+    @Transactional
+    public void addCategoryToSpot(Long spotId, Long categoryId) {
+        SpotCategoryMappingId mappingId = new SpotCategoryMappingId(spotId, categoryId);
+        if (categoryMappingRepository.existsById(mappingId)) {
+            return;
+        }
+        SpotEntity spot = spotRepository.findById(spotId)
+                .orElseThrow(() -> new IllegalArgumentException("Spot not found: " + spotId));
+        SpotCategoryEntity category = spotCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("SpotCategory not found: " + categoryId));
+        categoryMappingRepository.save(new SpotCategoryMappingEntity(spot, category));
+    }
+
+    /** 스팟에서 카테고리 연결을 해제한다 (soft delete). */
+    @Transactional
+    public void removeCategoryFromSpot(Long spotId, Long categoryId) {
+        SpotCategoryMappingId mappingId = new SpotCategoryMappingId(spotId, categoryId);
+        SpotCategoryMappingEntity mapping = categoryMappingRepository.findById(mappingId)
+                .orElseThrow(() -> new IllegalArgumentException("Mapping not found: spotId=" + spotId + ", categoryId=" + categoryId));
+        categoryMappingRepository.delete(mapping);
+    }
+
+    // ─────────────────────────────────────────────────────────
 
     /**
      * 주소 엔티티를 응답 DTO로 변환한다.
