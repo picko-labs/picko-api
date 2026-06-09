@@ -24,13 +24,19 @@ erDiagram
     }
 
     spot_address {
-        bigint      id          PK  "주소 고유 식별자"
-        varchar50   code            "주소 코드 (seoul, busan …)"
-        varchar50   name            "한글명 (서울, 부산 …)"
-        varchar100  name_en         "영문명 (Seoul, Busan …)"
-        timestamp   created_at      "생성 일시"
-        timestamp   updated_at      "최종 수정 일시"
-        timestamp   deleted_at      "삭제 일시 (soft delete)"
+        bigint      id             PK  "주소 고유 식별자"
+        varchar50   code               "주소 코드 (seoul, busan …)"
+        varchar100  region             "시/도 (서울특별시, 경기도 …)"
+        varchar100  city               "시/군/구 (강남구, 수원시 …)"
+        varchar100  town               "읍/면/동 (역삼동, 판교읍 …)"
+        varchar10   postal_code        "우편번호"
+        varchar500  address            "기본주소 (도로명/지번 주소)"
+        varchar255  address_detail     "상세주소"
+        decimal10_7 latitude           "위도 (WGS84)"
+        decimal10_7 longitude          "경도 (WGS84)"
+        timestamp   created_at         "생성 일시"
+        timestamp   updated_at         "최종 수정 일시"
+        timestamp   deleted_at         "삭제 일시 (soft delete)"
     }
 
     spot_categories {
@@ -48,11 +54,7 @@ erDiagram
         bigint      id              PK  "장소 고유 식별자"
         varchar255  name                "장소명"
         bigint      spot_address_id FK  "주소 분류 (spot_address.id)"
-        varchar255  location            "동/구 단위 지역명"
-        varchar500  address             "도로명 전체 주소"
         text        description         "장소 소개 문구"
-        decimal10_7 latitude            "위도 (WGS84)"
-        decimal10_7 longitude           "경도 (WGS84)"
         varchar500  image_url           "대표 이미지 URL"
         tinyint1    is_trending         "트렌딩 강조 여부"
         bigint      user_id         FK  "사용자 등록자 (users.id)"
