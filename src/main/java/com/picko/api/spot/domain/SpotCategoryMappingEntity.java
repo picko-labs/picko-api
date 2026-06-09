@@ -5,6 +5,7 @@ import com.picko.api.spot.domain.id.SpotCategoryMappingId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 /**
  * spot_category_mappings 테이블
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "spot_category_mappings")
+@SQLDelete(sql = "UPDATE spot_category_mappings SET deleted_at = NOW() WHERE spot_id = ? AND spot_category_id = ?")
 @Getter
 @NoArgsConstructor
 public class SpotCategoryMappingEntity extends BaseEntity {
@@ -33,4 +35,10 @@ public class SpotCategoryMappingEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spot_category_id")
     private SpotCategoryEntity spotCategory;
+
+    public SpotCategoryMappingEntity(SpotEntity spot, SpotCategoryEntity spotCategory) {
+        this.id = new SpotCategoryMappingId(spot.getId(), spotCategory.getId());
+        this.spot = spot;
+        this.spotCategory = spotCategory;
+    }
 }

@@ -1,8 +1,10 @@
 package com.picko.api.spot.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,9 +22,6 @@ public class SpotServiceDto {
 
         @Schema(description = "장소명")
         private String name;
-
-        @Schema(description = "동/구 단위 지역명")
-        private String location;
 
         @Schema(description = "대표 이미지 URL")
         private String imageUrl;
@@ -54,23 +53,11 @@ public class SpotServiceDto {
         @Schema(description = "장소명")
         private String name;
 
-        @Schema(description = "동/구 단위 지역명")
-        private String location;
-
-        @Schema(description = "도로명 전체 주소")
-        private String address;
-
         @Schema(description = "장소 소개 문구")
         private String description;
 
         @Schema(description = "트렌딩 여부")
         private Boolean isTrending;
-
-        @Schema(description = "위도")
-        private BigDecimal latitude;
-
-        @Schema(description = "경도")
-        private BigDecimal longitude;
 
         @Schema(description = "대표 이미지 URL")
         private String imageUrl;
@@ -114,7 +101,54 @@ public class SpotServiceDto {
     public static class AddressInfo {
         private Long id;
         private String code;
+        private String region;
+        private String city;
+        private String town;
+        private String postalCode;
+        private String address;
+        private String addressDetail;
+        private BigDecimal latitude;
+        private BigDecimal longitude;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SpotCreateRequest {
         private String name;
-        private String nameEn;
+        private Long spotAddressId;
+        private String description;
+        private String imageUrl;
+        private Boolean isTrending;
+        private Long userId;
+        private Long adminId;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SpotAddressRequest {
+        private String code;
+        private String region;
+        private String city;
+        private String town;
+        private String postalCode;
+        private String address;
+        private String addressDetail;
+        private BigDecimal latitude;
+        private BigDecimal longitude;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SpotCategoryRequest {
+        private String code;
+        private String name;
+        private String icon;
+        private Integer sortOrder;
     }
 }
