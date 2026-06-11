@@ -7,7 +7,6 @@ import com.picko.api.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * spots 테이블
@@ -23,7 +22,6 @@ import lombok.Setter;
 @Table(name = "spots")
 @SQLDelete(sql = "UPDATE spots SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class SpotEntity extends BaseEntity {
 
@@ -62,4 +60,25 @@ public class SpotEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
     private AdminEntity admin;
+
+    public static SpotEntity create(String name, String description, String imageUrl, boolean isTrending) {
+        SpotEntity spot = new SpotEntity();
+        spot.name = name;
+        spot.description = description;
+        spot.imageUrl = imageUrl;
+        spot.isTrending = isTrending;
+        return spot;
+    }
+
+    public void assignAddress(SpotAddressEntity spotAddress) {
+        this.spotAddress = spotAddress;
+    }
+
+    public void registerByUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public void registerByAdmin(AdminEntity admin) {
+        this.admin = admin;
+    }
 }

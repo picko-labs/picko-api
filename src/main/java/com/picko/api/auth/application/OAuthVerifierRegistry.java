@@ -1,5 +1,7 @@
 package com.picko.api.auth.application;
 
+import com.picko.api.common.exception.BusinessException;
+import com.picko.api.common.exception.ErrorCode;
 import com.picko.api.user.domain.AuthProvider;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +22,7 @@ public class OAuthVerifierRegistry {
     public OAuthTokenVerifier get(AuthProvider provider) {
         OAuthTokenVerifier verifier = verifiers.get(provider);
         if (verifier == null) {
-            throw new IllegalArgumentException("지원하지 않는 OAuth 공급자: " + provider);
+            throw new BusinessException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER);
         }
         return verifier;
     }

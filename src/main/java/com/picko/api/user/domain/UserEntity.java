@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * users 테이블
@@ -20,7 +19,6 @@ import lombok.Setter;
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class UserEntity extends BaseEntity {
 
@@ -53,4 +51,13 @@ public class UserEntity extends BaseEntity {
     /** 한국 거주 인증 여부 (false: 미인증, true: 인증) */
     @Column(name = "living_in_korea", nullable = false)
     private Boolean livingInKorea = false;
+
+    public static UserEntity ofOAuth(AuthProvider authProvider, String email, String name, String authProviderId) {
+        UserEntity user = new UserEntity();
+        user.authProvider = authProvider;
+        user.email = email;
+        user.name = name;
+        user.authProviderId = authProviderId;
+        return user;
+    }
 }

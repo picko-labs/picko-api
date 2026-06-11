@@ -27,6 +27,20 @@
 - `authProvider` 처럼 허용값이 고정된 필드는 `String` 대신 `Enum` 으로 선언한다.
 - 위도·경도처럼 항상 쌍으로 다뤄지는 값은 `@Embeddable` VO 로 포장한다.
 
+### 상태 변경 정책
+
+- **`@Setter` 를 선언하지 않는다.** 무분별한 외부 상태 변경을 막는다.
+- **생성**은 정적 팩토리 메서드로 한다 — `UserEntity.ofOAuth(...)`, `SpotEntity.create(...)`.
+- **생성 후 상태 변경**은 의도를 드러내는 도메인 메서드로 한다 — `changeProfile(...)`, `assignAddress(...)`.
+- 필드 주입이 필요한 연관관계도 도메인 메서드로 표현한다 (`registerByUser`, `registerByAdmin`).
+
+```java
+// 지양
+spot.setName(name);
+// 권장
+SpotEntity spot = SpotEntity.create(name, description, imageUrl, isTrending);
+```
+
 참조: `user/domain/UserEntity.java`, `spot/domain/SpotEntity.java`
 
 ## Application Service 패턴
@@ -42,7 +56,7 @@
 
 ## Lombok 사용 원칙
 
-- Entity: `@Getter` `@Setter` `@NoArgsConstructor`
+- Entity: `@Getter` `@NoArgsConstructor` (`@Setter` 금지 — 위 Entity 패턴 참조)
 - DTO Request: `@Getter` `@Builder` `@NoArgsConstructor` `@AllArgsConstructor`
 - DTO Response: `@Getter` `@Builder`
 - Service/Controller: `@RequiredArgsConstructor`

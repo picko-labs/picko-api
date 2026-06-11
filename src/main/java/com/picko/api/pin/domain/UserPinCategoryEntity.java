@@ -5,7 +5,6 @@ import com.picko.api.user.domain.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 
 /**
@@ -19,7 +18,6 @@ import org.hibernate.annotations.SQLDelete;
 @Table(name = "user_pin_categories")
 @SQLDelete(sql = "UPDATE user_pin_categories SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class UserPinCategoryEntity extends BaseEntity {
 

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * spot_categories 테이블
@@ -18,7 +17,6 @@ import lombok.Setter;
 @Table(name = "spot_categories")
 @SQLDelete(sql = "UPDATE spot_categories SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class SpotCategoryEntity extends BaseEntity {
 
@@ -42,4 +40,24 @@ public class SpotCategoryEntity extends BaseEntity {
     /** 화면 노출 순서 (오름차순 정렬) */
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;
+
+    public static SpotCategoryEntity create(String code, String name, String icon, Integer sortOrder) {
+        SpotCategoryEntity entity = new SpotCategoryEntity();
+        entity.code = code;
+        entity.name = name;
+        entity.icon = icon;
+        if (sortOrder != null) {
+            entity.sortOrder = sortOrder;
+        }
+        return entity;
+    }
+
+    public void update(String code, String name, String icon, Integer sortOrder) {
+        this.code = code;
+        this.name = name;
+        this.icon = icon;
+        if (sortOrder != null) {
+            this.sortOrder = sortOrder;
+        }
+    }
 }

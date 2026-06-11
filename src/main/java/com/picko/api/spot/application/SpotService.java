@@ -1,6 +1,8 @@
 package com.picko.api.spot.application;
 
 import com.picko.api.admin.infrastructure.AdminRepository;
+import com.picko.api.common.exception.BusinessException;
+import com.picko.api.common.exception.ErrorCode;
 import com.picko.api.pin.infrastructure.UserPinRepository;
 import com.picko.api.spot.application.dto.SpotServiceDto;
 import com.picko.api.spot.domain.SpotAddressEntity;
@@ -50,11 +52,11 @@ public class SpotService {
 
     /**
      * 스팟 단건 상세 정보를 반환한다.
-     * 존재하지 않는 id면 IllegalArgumentException을 던진다.
+     * 존재하지 않는 id면 BusinessException(SPOT_NOT_FOUND)을 던진다.
      */
     public SpotServiceDto.Detail getSpot(Long id) {
         SpotEntity spot = spotRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Spot not found: " + id));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_NOT_FOUND));
         return toDetail(spot);
     }
 
@@ -141,26 +143,26 @@ public class SpotService {
      * userId / adminId 중 하나만 세팅하며, 둘 다 null이면 배치 등록으로 처리된다.
      */
     public SpotServiceDto.Detail createSpot(SpotServiceDto.SpotCreateRequest request) {
-        SpotEntity spot = new SpotEntity();
-        spot.setName(request.getName());
-        spot.setDescription(request.getDescription());
-        spot.setImageUrl(request.getImageUrl());
-        spot.setIsTrending(request.getIsTrending() != null ? request.getIsTrending() : false);
+        SpotEntity spot = SpotEntity.create(
+                request.getName(),
+                request.getDescription(),
+                request.getImageUrl(),
+                request.getIsTrending() != null ? request.getIsTrending() : false);
 
         if (request.getSpotAddressId() != null) {
             SpotAddressEntity address = spotAddressRepository.findById(request.getSpotAddressId())
-                    .orElseThrow(() -> new IllegalArgumentException("SpotAddress not found: " + request.getSpotAddressId()));
-            spot.setSpotAddress(address);
+                    .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_ADDRESS_NOT_FOUND));
+            spot.assignAddress(address);
         }
 
         if (request.getUserId() != null) {
-            spot.setUser(userRepository.findById(request.getUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + request.getUserId())));
+            spot.registerByUser(userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND)));
         }
 
         if (request.getAdminId() != null) {
-            spot.setAdmin(adminRepository.findById(request.getAdminId())
-                    .orElseThrow(() -> new IllegalArgumentException("Admin not found: " + request.getAdminId())));
+            spot.registerByAdmin(adminRepository.findById(request.getAdminId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.ADMIN_NOT_FOUND)));
         }
 
         return toDetail(spotRepository.save(spot));
@@ -179,8 +181,10 @@ public class SpotService {
     /** 새 주소를 생성한다. */
     @Transactional
     public SpotServiceDto.AddressInfo createSpotAddress(SpotServiceDto.SpotAddressRequest request) {
-        SpotAddressEntity entity = new SpotAddressEntity();
-        applySpotAddressRequest(entity, request);
+        SpotAddressEntity entity = SpotAddressEntity.create(
+                request.getCode(), request.getRegion(), request.getCity(), request.getTown(),
+                request.getPostalCode(), request.getAddress(), request.getAddressDetail(),
+                toCoordinate(request));
         return toAddressInfo(spotAddressRepository.save(entity));
     }
 
@@ -188,8 +192,11 @@ public class SpotService {
     @Transactional
     public SpotServiceDto.AddressInfo updateSpotAddress(Long id, SpotServiceDto.SpotAddressRequest request) {
         SpotAddressEntity entity = spotAddressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("SpotAddress not found: " + id));
-        applySpotAddressRequest(entity, request);
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_ADDRESS_NOT_FOUND));
+        entity.update(
+                request.getCode(), request.getRegion(), request.getCity(), request.getTown(),
+                request.getPostalCode(), request.getAddress(), request.getAddressDetail(),
+                toCoordinate(request));
         return toAddressInfo(entity);
     }
 
@@ -197,21 +204,15 @@ public class SpotService {
     @Transactional
     public void deleteSpotAddress(Long id) {
         SpotAddressEntity entity = spotAddressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("SpotAddress not found: " + id));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_ADDRESS_NOT_FOUND));
         spotAddressRepository.delete(entity);
     }
 
-    private void applySpotAddressRequest(SpotAddressEntity entity, SpotServiceDto.SpotAddressRequest request) {
-        entity.setCode(request.getCode());
-        entity.setRegion(request.getRegion());
-        entity.setCity(request.getCity());
-        entity.setTown(request.getTown());
-        entity.setPostalCode(request.getPostalCode());
-        entity.setAddress(request.getAddress());
-        entity.setAddressDetail(request.getAddressDetail());
+    private Coordinate toCoordinate(SpotServiceDto.SpotAddressRequest request) {
         if (request.getLatitude() != null && request.getLongitude() != null) {
-            entity.setCoordinate(new Coordinate(request.getLatitude(), request.getLongitude()));
+            return new Coordinate(request.getLatitude(), request.getLongitude());
         }
+        return null;
     }
 
     // ── spot_categories CRUD ──────────────────────────────────
@@ -227,8 +228,8 @@ public class SpotService {
     /** 새 카테고리를 생성한다. */
     @Transactional
     public SpotServiceDto.CategoryInfo createSpotCategory(SpotServiceDto.SpotCategoryRequest request) {
-        SpotCategoryEntity entity = new SpotCategoryEntity();
-        applySpotCategoryRequest(entity, request);
+        SpotCategoryEntity entity = SpotCategoryEntity.create(
+                request.getCode(), request.getName(), request.getIcon(), request.getSortOrder());
         return toCategoryInfo(spotCategoryRepository.save(entity));
     }
 
@@ -236,8 +237,8 @@ public class SpotService {
     @Transactional
     public SpotServiceDto.CategoryInfo updateSpotCategory(Long id, SpotServiceDto.SpotCategoryRequest request) {
         SpotCategoryEntity entity = spotCategoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("SpotCategory not found: " + id));
-        applySpotCategoryRequest(entity, request);
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_CATEGORY_NOT_FOUND));
+        entity.update(request.getCode(), request.getName(), request.getIcon(), request.getSortOrder());
         return toCategoryInfo(entity);
     }
 
@@ -245,17 +246,8 @@ public class SpotService {
     @Transactional
     public void deleteSpotCategory(Long id) {
         SpotCategoryEntity entity = spotCategoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("SpotCategory not found: " + id));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_CATEGORY_NOT_FOUND));
         spotCategoryRepository.delete(entity);
-    }
-
-    private void applySpotCategoryRequest(SpotCategoryEntity entity, SpotServiceDto.SpotCategoryRequest request) {
-        entity.setCode(request.getCode());
-        entity.setName(request.getName());
-        entity.setIcon(request.getIcon());
-        if (request.getSortOrder() != null) {
-            entity.setSortOrder(request.getSortOrder());
-        }
     }
 
     // ── spot_category_mappings CRUD ───────────────────────────
@@ -271,9 +263,9 @@ public class SpotService {
             return;
         }
         SpotEntity spot = spotRepository.findById(spotId)
-                .orElseThrow(() -> new IllegalArgumentException("Spot not found: " + spotId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_NOT_FOUND));
         SpotCategoryEntity category = spotCategoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("SpotCategory not found: " + categoryId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_CATEGORY_NOT_FOUND));
         categoryMappingRepository.save(new SpotCategoryMappingEntity(spot, category));
     }
 
@@ -282,7 +274,7 @@ public class SpotService {
     public void removeCategoryFromSpot(Long spotId, Long categoryId) {
         SpotCategoryMappingId mappingId = new SpotCategoryMappingId(spotId, categoryId);
         SpotCategoryMappingEntity mapping = categoryMappingRepository.findById(mappingId)
-                .orElseThrow(() -> new IllegalArgumentException("Mapping not found: spotId=" + spotId + ", categoryId=" + categoryId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_CATEGORY_MAPPING_NOT_FOUND));
         categoryMappingRepository.delete(mapping);
     }
 
