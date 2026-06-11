@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * user_pins 테이블
@@ -20,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_pins")
 @SQLDelete(sql = "UPDATE user_pins SET deleted_at = NOW() WHERE id = ?")
 @Getter
+@Setter
 @NoArgsConstructor
 public class UserPinEntity extends BaseEntity {
 
