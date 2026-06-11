@@ -58,6 +58,7 @@ com.picko.api
 @.claude/rules/dev-principles.md
 @.claude/rules/code-conventions.md
 @.claude/rules/database.md
+@.claude/rules/query.md
 @.claude/rules/environment.md
 @.claude/rules/git-convention.md
 
