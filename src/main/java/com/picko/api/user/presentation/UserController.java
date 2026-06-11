@@ -1,5 +1,6 @@
 package com.picko.api.user.presentation;
 
+import com.picko.api.common.response.ApiResponse;
 import com.picko.api.common.security.UserPrincipal;
 import com.picko.api.user.application.UserService;
 import com.picko.api.user.application.dto.UserServiceDto;
@@ -22,7 +23,7 @@ public class UserController {
 
     @Operation(summary = "내 정보 조회")
     @GetMapping("/me")
-    public ResponseEntity<UserServiceDto.Response> getMe(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getUser(principal.getId()));
+    public ResponseEntity<ApiResponse<UserServiceDto.Response>> getMe(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.success(userService.getUser(principal.getId())));
     }
 }

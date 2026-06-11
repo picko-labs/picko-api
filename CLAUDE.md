@@ -57,6 +57,7 @@ com.picko.api
 
 @.claude/rules/dev-principles.md
 @.claude/rules/code-conventions.md
+@.claude/rules/api-response.md
 @.claude/rules/database.md
 @.claude/rules/query.md
 @.claude/rules/environment.md

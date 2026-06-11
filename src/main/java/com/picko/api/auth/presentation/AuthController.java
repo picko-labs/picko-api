@@ -2,6 +2,7 @@ package com.picko.api.auth.presentation;
 
 import com.picko.api.auth.application.AuthService;
 import com.picko.api.auth.application.dto.AuthServiceDto;
+import com.picko.api.common.response.ApiResponse;
 import com.picko.api.common.security.UserPrincipal;
 import com.picko.api.user.domain.AuthProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,31 +27,31 @@ public class AuthController {
 
     @Operation(summary = "소셜 로그인/회원가입", description = "provider: google | apple | line")
     @PostMapping("/{provider}")
-    public ResponseEntity<AuthServiceDto.TokenResponse> login(
+    public ResponseEntity<ApiResponse<AuthServiceDto.TokenResponse>> login(
             @PathVariable String provider,
             @RequestBody AuthServiceDto.OAuthLoginRequest request) {
         AuthProvider authProvider = AuthProvider.valueOf(provider.toUpperCase());
-        return ResponseEntity.ok(authService.login(authProvider, request.getToken()));
+        return ResponseEntity.ok(ApiResponse.success(authService.login(authProvider, request.getToken())));
     }
 
     @Operation(summary = "Access Token 갱신")
     @PostMapping("/refresh")
-    public ResponseEntity<AuthServiceDto.TokenResponse> refresh(
+    public ResponseEntity<ApiResponse<AuthServiceDto.TokenResponse>> refresh(
             @RequestBody AuthServiceDto.RefreshRequest request) {
-        return ResponseEntity.ok(authService.refresh(request.getRefreshToken()));
+        return ResponseEntity.ok(ApiResponse.success(authService.refresh(request.getRefreshToken())));
     }
 
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@AuthenticationPrincipal UserPrincipal principal) {
+    public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal UserPrincipal principal) {
         authService.logout(principal.getId());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.<Void>success(null));
     }
 
     @Operation(summary = "회원탈퇴")
     @DeleteMapping("/me")
-    public ResponseEntity<Void> withdraw(@AuthenticationPrincipal UserPrincipal principal) {
+    public ResponseEntity<ApiResponse<Void>> withdraw(@AuthenticationPrincipal UserPrincipal principal) {
         authService.withdraw(principal.getId());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.<Void>success(null));
     }
 }
