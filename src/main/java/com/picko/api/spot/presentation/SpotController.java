@@ -21,7 +21,7 @@ public class SpotController {
 
     // ── 스팟 ──────────────────────────────────────────────────
 
-    @Operation(summary = "스팟 목록 조회", description = "연동용")
+    @Operation(summary = "스팟 목록 조회", tags = {"Spot (연동용)"})
     @GetMapping("/spots")
     public ResponseEntity<ApiResponse<List<SpotServiceDto.ListItem>>> getSpots(
             @RequestParam(required = false) String addressCode,
