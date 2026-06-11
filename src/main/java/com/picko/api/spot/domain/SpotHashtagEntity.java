@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * spot_hashtags 테이블
@@ -19,7 +18,6 @@ import lombok.Setter;
 @Table(name = "spot_hashtags")
 @SQLDelete(sql = "UPDATE spot_hashtags SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class SpotHashtagEntity extends BaseEntity {
 

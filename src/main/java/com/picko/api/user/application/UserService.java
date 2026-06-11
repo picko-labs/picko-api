@@ -1,5 +1,7 @@
 package com.picko.api.user.application;
 
+import com.picko.api.common.exception.BusinessException;
+import com.picko.api.common.exception.ErrorCode;
 import com.picko.api.user.application.dto.UserServiceDto;
 import com.picko.api.user.domain.AuthProvider;
 import com.picko.api.user.domain.UserEntity;
@@ -17,7 +19,7 @@ public class UserService {
 
     public UserServiceDto.Response getUser(Long id) {
         UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         return toResponse(user);
     }
 
@@ -25,14 +27,8 @@ public class UserService {
     public UserServiceDto.Response findOrCreateByOAuth(AuthProvider provider, String email, String name, String sub) {
         UserEntity user = userRepository
                 .findByAuthProviderAndAuthProviderId(provider, sub)
-                .orElseGet(() -> {
-                    UserEntity newUser = new UserEntity();
-                    newUser.setName(name);
-                    newUser.setEmail(email);
-                    newUser.setAuthProvider(provider);
-                    newUser.setAuthProviderId(sub);
-                    return userRepository.save(newUser);
-                });
+                .orElseGet(() -> userRepository.save(
+                        UserEntity.ofOAuth(provider, email, name, sub)));
         return toResponse(user);
     }
 

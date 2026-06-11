@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * spot_address 테이블
@@ -18,7 +17,6 @@ import lombok.Setter;
 @Table(name = "spot_address")
 @SQLDelete(sql = "UPDATE spot_address SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class SpotAddressEntity extends BaseEntity {
 
@@ -58,4 +56,32 @@ public class SpotAddressEntity extends BaseEntity {
     /** WGS84 좌표 (위도·경도) */
     @Embedded
     private Coordinate coordinate;
+
+    public static SpotAddressEntity create(String code, String region, String city, String town,
+                                           String postalCode, String address, String addressDetail,
+                                           Coordinate coordinate) {
+        SpotAddressEntity entity = new SpotAddressEntity();
+        entity.apply(code, region, city, town, postalCode, address, addressDetail, coordinate);
+        return entity;
+    }
+
+    public void update(String code, String region, String city, String town,
+                       String postalCode, String address, String addressDetail, Coordinate coordinate) {
+        apply(code, region, city, town, postalCode, address, addressDetail, coordinate);
+    }
+
+    private void apply(String code, String region, String city, String town,
+                       String postalCode, String address, String addressDetail, Coordinate coordinate) {
+        this.code = code;
+        this.region = region;
+        this.city = city;
+        this.town = town;
+        this.postalCode = postalCode;
+        this.address = address;
+        this.addressDetail = addressDetail;
+        // 좌표는 요청에 포함된 경우에만 갱신한다 (수정 시 미전달이면 기존 값 유지)
+        if (coordinate != null) {
+            this.coordinate = coordinate;
+        }
+    }
 }

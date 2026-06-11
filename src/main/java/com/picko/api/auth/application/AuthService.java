@@ -1,6 +1,8 @@
 package com.picko.api.auth.application;
 
 import com.picko.api.auth.application.dto.AuthServiceDto;
+import com.picko.api.common.exception.BusinessException;
+import com.picko.api.common.exception.ErrorCode;
 import com.picko.api.common.security.JwtProvider;
 import com.picko.api.user.application.UserService;
 import com.picko.api.user.application.dto.UserServiceDto;
@@ -33,14 +35,14 @@ public class AuthService {
 
     public AuthServiceDto.TokenResponse refresh(String refreshToken) {
         if (!jwtProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 Refresh Token");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         Long userId = jwtProvider.getUserIdFromToken(refreshToken);
         String stored = redisTemplate.opsForValue().get(REFRESH_TOKEN_PREFIX + userId);
 
         if (!refreshToken.equals(stored)) {
-            throw new IllegalArgumentException("Refresh Token 불일치");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         UserServiceDto.Response user = userService.getUser(userId);

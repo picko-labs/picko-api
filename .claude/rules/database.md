@@ -50,6 +50,12 @@ CREATE TABLE users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='서비스 사용자 계정';
 ```
 
+## 조회 안전 규칙
+
+- 리스트를 반환하는 API 는 **항상 페이지네이션**한다 — 전체 조회(`findAll()`)를 노출하지 않는다.
+- 대량 변경은 단건 반복 대신 배치 처리를 고려한다.
+- 복잡 조회·N+1·Fetch Join 등 쿼리 작성 기준은 `query.md` 를 따른다.
+
 ## 네이밍 규칙
 
 | 대상 | 규칙 | 예시 |

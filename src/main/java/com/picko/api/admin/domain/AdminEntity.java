@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * admins 테이블
@@ -18,7 +17,6 @@ import lombok.Setter;
 @Table(name = "admins")
 @SQLDelete(sql = "UPDATE admins SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class AdminEntity extends BaseEntity {
 

@@ -1,6 +1,8 @@
 package com.picko.api.auth.application.verifier;
 
 import com.picko.api.auth.application.OAuthTokenVerifier;
+import com.picko.api.common.exception.BusinessException;
+import com.picko.api.common.exception.ErrorCode;
 import com.picko.api.user.domain.AuthProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,7 +22,7 @@ public class GoogleTokenVerifier implements OAuthTokenVerifier {
     @Override
     public OAuthUserInfo verify(String token) {
         if (token == null || token.isBlank()) {
-            throw new IllegalArgumentException("ID Token이 비어 있습니다");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         Map<String, Object> response;
@@ -30,11 +32,11 @@ public class GoogleTokenVerifier implements OAuthTokenVerifier {
                     .retrieve()
                     .body(new ParameterizedTypeReference<>() {});
         } catch (Exception e) {
-            throw new IllegalArgumentException("Google ID Token 검증 실패");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         if (response == null || !clientId.equals(response.get("aud"))) {
-            throw new IllegalArgumentException("유효하지 않은 Google ID Token");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         return new OAuthUserInfo(
