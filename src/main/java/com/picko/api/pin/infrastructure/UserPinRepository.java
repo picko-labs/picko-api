@@ -15,4 +15,6 @@ public interface UserPinRepository extends JpaRepository<UserPinEntity, Long> {
     Optional<UserPinEntity> findByUserIdAndSpotIdAndDeletedAtIsNull(Long userId, Long spotId);
 
     long countBySpotIdAndDeletedAtIsNull(Long spotId);
+
+    boolean existsByUserIdAndSpotIdAndDeletedAtIsNull(Long userId, Long spotId);
 }
