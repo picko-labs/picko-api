@@ -34,13 +34,9 @@ public class PinService {
 
     @Transactional
     public PinServiceDto.UserPinCategoryInfo createUserPinCategory(PinServiceDto.UserPinCategoryCreateRequest request) {
-        UserPinCategoryEntity entity = new UserPinCategoryEntity();
-        entity.setUser(userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + request.getUserId())));
-        entity.setName(request.getName());
-        if (request.getSortOrder() != null) {
-            entity.setSortOrder(request.getSortOrder());
-        }
+        var user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + request.getUserId()));
+        UserPinCategoryEntity entity = UserPinCategoryEntity.create(user, request.getName(), request.getSortOrder());
         return toCategoryInfo(userPinCategoryRepository.save(entity));
     }
 
@@ -48,12 +44,7 @@ public class PinService {
     public PinServiceDto.UserPinCategoryInfo updateUserPinCategory(Long id, PinServiceDto.UserPinCategoryUpdateRequest request) {
         UserPinCategoryEntity entity = userPinCategoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("UserPinCategory not found: " + id));
-        if (request.getName() != null) {
-            entity.setName(request.getName());
-        }
-        if (request.getSortOrder() != null) {
-            entity.setSortOrder(request.getSortOrder());
-        }
+        entity.update(request.getName(), request.getSortOrder());
         return toCategoryInfo(entity);
     }
 

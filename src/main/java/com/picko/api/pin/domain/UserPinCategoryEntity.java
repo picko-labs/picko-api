@@ -38,4 +38,23 @@ public class UserPinCategoryEntity extends BaseEntity {
     /** 카테고리 노출 순서 (오름차순 정렬) */
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;
+
+    public static UserPinCategoryEntity create(UserEntity user, String name, Integer sortOrder) {
+        UserPinCategoryEntity entity = new UserPinCategoryEntity();
+        entity.user = user;
+        entity.name = name;
+        if (sortOrder != null) {
+            entity.sortOrder = sortOrder;
+        }
+        return entity;
+    }
+
+    public void update(String name, Integer sortOrder) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (sortOrder != null) {
+            this.sortOrder = sortOrder;
+        }
+    }
 }
