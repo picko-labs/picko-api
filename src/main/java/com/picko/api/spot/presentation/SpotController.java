@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Tag(name = "Spot", description = "스팟 API")
@@ -24,12 +25,16 @@ public class SpotController {
     @Operation(summary = "스팟 목록 조회", description = "연동용")
     @GetMapping("/spots")
     public ResponseEntity<ApiResponse<List<SpotServiceDto.ListItem>>> getSpots(
-            @RequestParam(required = false) String addressCode,
-            @RequestParam(required = false) Boolean isTrending,
-            @RequestParam(required = false) String categoryCode,
-            @RequestParam(required = false) String hashtagCode) {
-        return ResponseEntity.ok(ApiResponse.success(
-                spotService.getSpots(addressCode, isTrending, categoryCode, hashtagCode)));
+            @RequestParam BigDecimal swLat,
+            @RequestParam BigDecimal swLng,
+            @RequestParam BigDecimal neLat,
+            @RequestParam BigDecimal neLng,
+            @RequestParam(required = false) String categoryCode) {
+        SpotServiceDto.ViewportRequest request = SpotServiceDto.ViewportRequest.builder()
+                .swLat(swLat).swLng(swLng).neLat(neLat).neLng(neLng)
+                .categoryCode(categoryCode)
+                .build();
+        return ResponseEntity.ok(ApiResponse.success(spotService.getSpots(request)));
     }
 
     @Operation(summary = "스팟 상세 조회", description = "연동용")

@@ -115,6 +115,18 @@ public class SpotServiceDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ViewportRequest {
+        private BigDecimal swLat;
+        private BigDecimal swLng;
+        private BigDecimal neLat;
+        private BigDecimal neLng;
+        private String categoryCode;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SpotCreateRequest {
         private String name;
         private Long spotAddressId;
