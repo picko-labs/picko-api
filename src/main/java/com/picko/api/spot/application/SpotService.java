@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -38,15 +39,15 @@ public class SpotService {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
 
-    /**
-     * 필터 조건에 맞는 스팟 목록을 반환한다.
-     * 모든 파라미터는 선택적이며 null이면 해당 조건을 무시한다.
-     */
-    public List<SpotServiceDto.ListItem> getSpots(
-            String addressCode, Boolean isTrending, String categoryCode, String hashtagCode) {
-        return spotRepository.findByFilters(addressCode, isTrending, categoryCode, hashtagCode)
+    public List<SpotServiceDto.ListItem> getSpots(SpotServiceDto.ViewportRequest request) {
+        return spotRepository.findByViewport(
+                        request.getSwLat(), request.getSwLng(),
+                        request.getNeLat(), request.getNeLng(),
+                        request.getCategoryCode())
                 .stream()
-                .map(this::toListItem)
+                .map(spot -> toListItem(spot, userPinRepository.countBySpotIdAndDeletedAtIsNull(spot.getId())))
+                .sorted(Comparator.comparingLong(SpotServiceDto.ListItem::getPinCount).reversed())
+                .limit(20)
                 .toList();
     }
 
@@ -60,12 +61,7 @@ public class SpotService {
         return toDetail(spot);
     }
 
-    /**
-     * 스팟 목록 아이템 DTO로 변환한다.
-     * 좌표는 spotAddress를 통해 접근한다. spotAddress가 미분류(null)이면 좌표도 null로 반환된다.
-     * pinCount는 비정규화하지 않으므로 매 호출마다 user_pins를 집계한다.
-     */
-    private SpotServiceDto.ListItem toListItem(SpotEntity spot) {
+    private SpotServiceDto.ListItem toListItem(SpotEntity spot, long pinCount) {
         List<SpotServiceDto.CategoryInfo> categories = categoryMappingRepository
                 .findByIdSpotId(spot.getId())
                 .stream()
@@ -81,7 +77,7 @@ public class SpotService {
                 .latitude(coordinate != null ? coordinate.getLatitude() : null)
                 .longitude(coordinate != null ? coordinate.getLongitude() : null)
                 .categories(categories)
-                .pinCount(userPinRepository.countBySpotIdAndDeletedAtIsNull(spot.getId()))
+                .pinCount(pinCount)
                 .build();
     }
 
