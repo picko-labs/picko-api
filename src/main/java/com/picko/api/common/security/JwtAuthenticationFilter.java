@@ -1,5 +1,6 @@
 package com.picko.api.common.security;
 
+import com.picko.api.common.filter.RequestLogFilter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
+            request.setAttribute(RequestLogFilter.ATTR_USER_ID, userId);
         }
 
         chain.doFilter(request, response);
