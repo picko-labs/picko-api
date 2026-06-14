@@ -23,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -39,13 +41,21 @@ public class SpotService {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
 
-    public List<SpotServiceDto.ListItem> getSpots(SpotServiceDto.ViewportRequest request) {
+    /**
+     * 뷰포트 내 스팟 목록을 반환한다.
+     * 비회원(userId == null)은 지도 기본정보만, 회원은 개인화(isPinned)를 포함한다.
+     */
+    public List<SpotServiceDto.ListItem> getSpots(SpotServiceDto.ViewportRequest request, Long userId) {
+        Set<Long> pinnedSpotIds = pinnedSpotIdsOf(userId);
+
         return spotRepository.findByViewport(
                         request.getSwLat(), request.getSwLng(),
                         request.getNeLat(), request.getNeLng(),
                         request.getCategoryCode())
                 .stream()
-                .map(spot -> toListItem(spot, userPinRepository.countBySpotIdAndDeletedAtIsNull(spot.getId())))
+                .map(spot -> toListItem(spot,
+                        userPinRepository.countBySpotIdAndDeletedAtIsNull(spot.getId()),
+                        pinnedSpotIds.contains(spot.getId())))
                 .sorted(Comparator.comparingLong(SpotServiceDto.ListItem::getPinCount).reversed())
                 .limit(20)
                 .toList();
@@ -54,14 +64,24 @@ public class SpotService {
     /**
      * 스팟 단건 상세 정보를 반환한다.
      * 존재하지 않는 id면 BusinessException(SPOT_NOT_FOUND)을 던진다.
+     * 비회원(userId == null)은 isPinned == false 로 응답한다.
      */
-    public SpotServiceDto.Detail getSpot(Long id) {
+    public SpotServiceDto.Detail getSpot(Long id, Long userId) {
         SpotEntity spot = spotRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_NOT_FOUND));
-        return toDetail(spot);
+        boolean isPinned = userId != null
+                && userPinRepository.existsByUserIdAndSpotIdAndDeletedAtIsNull(userId, id);
+        return toDetail(spot, isPinned);
     }
 
-    private SpotServiceDto.ListItem toListItem(SpotEntity spot, long pinCount) {
+    /** 회원이면 핀한 spotId 집합을, 비회원이면 빈 집합을 반환한다 (개인화 isPinned 판정용). */
+    private Set<Long> pinnedSpotIdsOf(Long userId) {
+        return userId == null
+                ? Set.of()
+                : new HashSet<>(userPinRepository.findPinnedSpotIds(userId));
+    }
+
+    private SpotServiceDto.ListItem toListItem(SpotEntity spot, long pinCount, boolean isPinned) {
         List<SpotServiceDto.CategoryInfo> categories = categoryMappingRepository
                 .findByIdSpotId(spot.getId())
                 .stream()
@@ -78,6 +98,7 @@ public class SpotService {
                 .longitude(coordinate != null ? coordinate.getLongitude() : null)
                 .categories(categories)
                 .pinCount(pinCount)
+                .isPinned(isPinned)
                 .build();
     }
 
@@ -85,7 +106,7 @@ public class SpotService {
      * 스팟 상세 DTO로 변환한다.
      * 목록과 달리 해시태그 정보를 포함하며, 주소 전체 정보(region/city/town/좌표 등)를 AddressInfo에 담아 반환한다.
      */
-    private SpotServiceDto.Detail toDetail(SpotEntity spot) {
+    private SpotServiceDto.Detail toDetail(SpotEntity spot, boolean isPinned) {
         List<SpotServiceDto.CategoryInfo> categories = categoryMappingRepository
                 .findByIdSpotId(spot.getId())
                 .stream()
@@ -108,6 +129,7 @@ public class SpotService {
                 .categories(categories)
                 .hashtags(hashtags)
                 .pinCount(userPinRepository.countBySpotIdAndDeletedAtIsNull(spot.getId()))
+                .isPinned(isPinned)
                 .createdAt(spot.getCreatedAt())
                 .build();
     }
@@ -161,7 +183,7 @@ public class SpotService {
                     .orElseThrow(() -> new BusinessException(ErrorCode.ADMIN_NOT_FOUND)));
         }
 
-        return toDetail(spotRepository.save(spot));
+        return toDetail(spotRepository.save(spot), false);
     }
 
     // ── spot_address CRUD ─────────────────────────────────────

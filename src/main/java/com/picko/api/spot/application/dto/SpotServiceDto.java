@@ -42,6 +42,9 @@ public class SpotServiceDto {
 
         @Schema(description = "핀 수")
         private Long pinCount;
+
+        @Schema(description = "요청 사용자의 핀 여부 (비회원은 항상 false)")
+        private Boolean isPinned;
     }
 
     @Schema(description = "스팟 상세")
@@ -75,6 +78,9 @@ public class SpotServiceDto {
 
         @Schema(description = "핀 수")
         private Long pinCount;
+
+        @Schema(description = "요청 사용자의 핀 여부 (비회원은 항상 false)")
+        private Boolean isPinned;
 
         @Schema(description = "등록 일시")
         private LocalDateTime createdAt;
