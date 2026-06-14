@@ -1,6 +1,7 @@
 package com.picko.api.spot.presentation;
 
 import com.picko.api.common.response.ApiResponse;
+import com.picko.api.common.security.CurrentUserId;
 import com.picko.api.spot.application.SpotService;
 import com.picko.api.spot.application.dto.SpotServiceDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,23 +23,26 @@ public class SpotController {
 
     // ── 스팟 ──────────────────────────────────────────────────
 
-    @Operation(summary = "스팟 목록 조회", description = "연동용")
+    @Operation(summary = "스팟 목록 조회", description = "비회원 호출 가능. 회원이면 isPinned 개인화 포함")
     @GetMapping("/spots")
     public ResponseEntity<ApiResponse<List<SpotServiceDto.ListItem>>> getSpots(
             @RequestParam BigDecimal swLat,
             @RequestParam BigDecimal swLng,
             @RequestParam BigDecimal neLat,
             @RequestParam BigDecimal neLng,
-            @RequestParam(required = false) String categoryCode) {
+            @RequestParam(required = false) String categoryCode,
+            @CurrentUserId Long userId) {
         SpotServiceDto.ViewportRequest request =
                 SpotServiceDto.ViewportRequest.of(swLat, swLng, neLat, neLng, categoryCode);
-        return ResponseEntity.ok(ApiResponse.success(spotService.getSpots(request)));
+        return ResponseEntity.ok(ApiResponse.success(spotService.getSpots(request, userId)));
     }
 
-    @Operation(summary = "스팟 상세 조회", description = "연동용")
+    @Operation(summary = "스팟 상세 조회", description = "비회원 호출 가능. 회원이면 isPinned 개인화 포함")
     @GetMapping("/spots/{id}")
-    public ResponseEntity<ApiResponse<SpotServiceDto.Detail>> getSpot(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(spotService.getSpot(id)));
+    public ResponseEntity<ApiResponse<SpotServiceDto.Detail>> getSpot(
+            @PathVariable Long id,
+            @CurrentUserId Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(spotService.getSpot(id, userId)));
     }
 
     @Operation(summary = "스팟 저장", description = "연동용")

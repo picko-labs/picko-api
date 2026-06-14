@@ -30,6 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/google", "/auth/apple", "/auth/line").permitAll()
+                        // 지도 탐색은 비회원도 허용 — 회원이면 토큰으로 개인화 정보를 얹는다
+                        .requestMatchers(HttpMethod.GET, "/spots", "/spots/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
