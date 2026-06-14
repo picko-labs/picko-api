@@ -30,10 +30,8 @@ public class SpotController {
             @RequestParam BigDecimal neLat,
             @RequestParam BigDecimal neLng,
             @RequestParam(required = false) String categoryCode) {
-        SpotServiceDto.ViewportRequest request = SpotServiceDto.ViewportRequest.builder()
-                .swLat(swLat).swLng(swLng).neLat(neLat).neLng(neLng)
-                .categoryCode(categoryCode)
-                .build();
+        SpotServiceDto.ViewportRequest request =
+                SpotServiceDto.ViewportRequest.of(swLat, swLng, neLat, neLng, categoryCode);
         return ResponseEntity.ok(ApiResponse.success(spotService.getSpots(request)));
     }
 
