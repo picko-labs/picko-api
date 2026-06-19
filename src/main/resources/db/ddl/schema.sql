@@ -258,4 +258,44 @@ CREATE TABLE spot_hashtag_mappings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   COMMENT='장소 ↔ 해시태그 M:N 연결';
 
+-- ────────────────────────────────────────────────────────────
+-- 11. spot_requests
+--
+-- 목적: 사용자가 신청한 스팟 등록 요청 관리
+-- 설명: 사용자가 제출한 스팟 신청을 어드민이 검토·승인하면
+--       spots 테이블에 저장된다. place_id는 추후 Google Maps
+--       연동 시 상세 정보 재조회에 활용한다.
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE spot_requests (
+    id                BIGINT         NOT NULL AUTO_INCREMENT  COMMENT '신청 고유 식별자 (PK)',
+    user_id           BIGINT         NOT NULL                 COMMENT '신청한 사용자 — users.id 참조',
+    place_id          VARCHAR(255)   NULL                     COMMENT 'Google Maps place_id (추후 연동용)',
+    name              VARCHAR(255)   NOT NULL                 COMMENT '장소명',
+    description       TEXT           NULL                     COMMENT '장소 소개 문구',
+    image_url         VARCHAR(500)   NULL                     COMMENT '대표 이미지 URL',
+    latitude          DECIMAL(10, 7) NULL                     COMMENT '위도 (WGS84)',
+    longitude         DECIMAL(10, 7) NULL                     COMMENT '경도 (WGS84)',
+    address           VARCHAR(500)   NULL                     COMMENT '기본주소',
+    region            VARCHAR(100)   NULL                     COMMENT '시/도',
+    city              VARCHAR(100)   NULL                     COMMENT '시/군/구',
+    town              VARCHAR(100)   NULL                     COMMENT '읍/면/동',
+    postal_code       VARCHAR(10)    NULL                     COMMENT '우편번호',
+    status            VARCHAR(20)    NOT NULL DEFAULT 'PENDING' COMMENT '처리 상태 (PENDING | APPROVED | REJECTED)',
+    reject_reason     VARCHAR(500)   NULL                     COMMENT '반려 사유',
+    reviewed_admin_id BIGINT         NULL                     COMMENT '검토한 어드민 — admins.id 참조',
+    reviewed_at       TIMESTAMP      NULL                     COMMENT '검토 일시',
+    spot_id           BIGINT         NULL                     COMMENT '승인 후 생성된 스팟 — spots.id 참조',
+    created_at        TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP            COMMENT '신청 일시',
+    updated_at        TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
+                          ON UPDATE CURRENT_TIMESTAMP                              COMMENT '최종 수정 일시',
+    deleted_at        TIMESTAMP      NULL                                           COMMENT '삭제 일시 (soft delete)',
+    PRIMARY KEY (id),
+    KEY idx_spot_requests_user   (user_id),
+    KEY idx_spot_requests_status (status),
+    CONSTRAINT fk_spot_requests_user  FOREIGN KEY (user_id)           REFERENCES users  (id),
+    CONSTRAINT fk_spot_requests_admin FOREIGN KEY (reviewed_admin_id) REFERENCES admins (id),
+    CONSTRAINT fk_spot_requests_spot  FOREIGN KEY (spot_id)           REFERENCES spots  (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  COMMENT='사용자 스팟 등록 신청 (어드민 승인 후 spots 테이블로 이동)';
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -111,6 +111,30 @@ erDiagram
         timestamp   deleted_at          "연결 삭제 일시 (soft delete)"
     }
 
+    spot_requests {
+        bigint      id                PK  "신청 고유 식별자"
+        bigint      user_id           FK  "신청 사용자 (users.id)"
+        varchar255  place_id              "Google Maps place_id (추후 연동용)"
+        varchar255  name                  "장소명"
+        text        description           "장소 소개 문구"
+        varchar500  image_url             "대표 이미지 URL"
+        decimal10_7 latitude              "위도 (WGS84)"
+        decimal10_7 longitude             "경도 (WGS84)"
+        varchar500  address               "기본주소"
+        varchar100  region                "시/도"
+        varchar100  city                  "시/군/구"
+        varchar100  town                  "읍/면/동"
+        varchar10   postal_code           "우편번호"
+        varchar20   status                "PENDING | APPROVED | REJECTED"
+        varchar500  reject_reason         "반려 사유"
+        bigint      reviewed_admin_id  FK  "검토 어드민 (admins.id)"
+        timestamp   reviewed_at            "검토 일시"
+        bigint      spot_id           FK  "승인된 스팟 (spots.id)"
+        timestamp   created_at             "신청 일시"
+        timestamp   updated_at             "최종 수정 일시"
+        timestamp   deleted_at             "삭제 일시 (soft delete)"
+    }
+
     %% ── 관계 정의 ──────────────────────────────────────────
 
     %% users → spots : 유저가 스팟을 직접 등록
@@ -137,3 +161,8 @@ erDiagram
     %% spots ↔ spot_hashtags : 해시태그 필터
     spots                ||--o{ spot_hashtag_mappings    : "해시태그 연결"
     spot_hashtags        ||--o{ spot_hashtag_mappings    : "해시태그"
+
+    %% users → spot_requests : 사용자 스팟 등록 신청
+    users                ||--o{ spot_requests            : "신청(user_id)"
+    admins               ||--o{ spot_requests            : "검토(reviewed_admin_id)"
+    spot_requests        |o--o| spots                    : "승인된 스팟(spot_id)"

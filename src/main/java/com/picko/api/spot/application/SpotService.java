@@ -10,13 +10,17 @@ import com.picko.api.spot.domain.SpotCategoryEntity;
 import com.picko.api.spot.domain.SpotCategoryMappingEntity;
 import com.picko.api.spot.domain.SpotEntity;
 import com.picko.api.spot.domain.SpotHashtagEntity;
+import com.picko.api.spot.domain.SpotHashtagMappingEntity;
+import com.picko.api.spot.domain.SpotRequestEntity;
 import com.picko.api.spot.domain.id.SpotCategoryMappingId;
 import com.picko.api.spot.domain.vo.Coordinate;
 import com.picko.api.spot.infrastructure.SpotAddressRepository;
 import com.picko.api.spot.infrastructure.SpotCategoryMappingRepository;
 import com.picko.api.spot.infrastructure.SpotCategoryRepository;
 import com.picko.api.spot.infrastructure.SpotHashtagMappingRepository;
+import com.picko.api.spot.infrastructure.SpotHashtagRepository;
 import com.picko.api.spot.infrastructure.SpotRepository;
+import com.picko.api.spot.infrastructure.SpotRequestRepository;
 import com.picko.api.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +40,9 @@ public class SpotService {
     private final SpotAddressRepository spotAddressRepository;
     private final SpotCategoryRepository spotCategoryRepository;
     private final SpotCategoryMappingRepository categoryMappingRepository;
+    private final SpotHashtagRepository spotHashtagRepository;
     private final SpotHashtagMappingRepository hashtagMappingRepository;
+    private final SpotRequestRepository spotRequestRepository;
     private final UserPinRepository userPinRepository;
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
@@ -184,6 +190,106 @@ public class SpotService {
         }
 
         return toDetail(spotRepository.save(spot), false);
+    }
+
+    // ── spot_requests ─────────────────────────────────────────
+
+    /** 사용자의 스팟 등록 신청을 저장한다. */
+    @Transactional
+    public SpotServiceDto.SpotRequestInfo createSpotRequest(SpotServiceDto.SpotRequestCreateRequest request, Long userId) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        SpotRequestEntity spotRequest = SpotRequestEntity.create(
+                user, request.getPlaceId(), request.getName(),
+                request.getDescription(), request.getImageUrl(),
+                request.getLatitude(), request.getLongitude(),
+                request.getAddress(), request.getRegion(),
+                request.getCity(), request.getTown(), request.getPostalCode());
+
+        return toSpotRequestInfo(spotRequestRepository.save(spotRequest));
+    }
+
+    /**
+     * 스팟 신청을 승인 또는 반려한다.
+     * APPROVED: spot_requests 데이터를 기반으로 spots 테이블에 저장한다.
+     * REJECTED: 반려 사유를 기록하고 상태를 변경한다.
+     */
+    @Transactional
+    public SpotServiceDto.SpotRequestInfo reviewSpotRequest(Long requestId, Long adminId,
+                                                            SpotServiceDto.SpotRequestReviewRequest request) {
+        SpotRequestEntity spotRequest = spotRequestRepository.findById(requestId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_REQUEST_NOT_FOUND));
+        var admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ADMIN_NOT_FOUND));
+
+        SpotRequestEntity.Status status = SpotRequestEntity.Status.valueOf(request.getStatus());
+
+        if (status == SpotRequestEntity.Status.APPROVED) {
+            com.picko.api.spot.domain.vo.Coordinate coordinate =
+                    (spotRequest.getLatitude() != null && spotRequest.getLongitude() != null)
+                            ? new com.picko.api.spot.domain.vo.Coordinate(spotRequest.getLatitude(), spotRequest.getLongitude())
+                            : null;
+
+            SpotAddressEntity address = SpotAddressEntity.create(
+                    request.getAddressCode(),
+                    spotRequest.getRegion(), spotRequest.getCity(), spotRequest.getTown(),
+                    spotRequest.getPostalCode(), spotRequest.getAddress(), null,
+                    coordinate);
+            spotAddressRepository.save(address);
+
+            SpotEntity spot = SpotEntity.create(
+                    spotRequest.getName(), spotRequest.getDescription(),
+                    spotRequest.getImageUrl(),
+                    request.getIsTrending() != null ? request.getIsTrending() : false);
+            spot.assignAddress(address);
+            spot.registerByUser(spotRequest.getUser());
+            spotRepository.save(spot);
+
+            if (request.getCategoryIds() != null) {
+                for (Long categoryId : request.getCategoryIds()) {
+                    SpotCategoryEntity category = spotCategoryRepository.findById(categoryId)
+                            .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_CATEGORY_NOT_FOUND));
+                    categoryMappingRepository.save(new SpotCategoryMappingEntity(spot, category));
+                }
+            }
+
+            if (request.getHashtagIds() != null) {
+                for (Long hashtagId : request.getHashtagIds()) {
+                    SpotHashtagEntity hashtag = spotHashtagRepository.findById(hashtagId)
+                            .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_HASHTAG_NOT_FOUND));
+                    hashtagMappingRepository.save(new SpotHashtagMappingEntity(spot, hashtag));
+                }
+            }
+
+            spotRequest.approve(admin, spot);
+        } else {
+            spotRequest.reject(admin, request.getRejectReason());
+        }
+
+        return toSpotRequestInfo(spotRequest);
+    }
+
+    private SpotServiceDto.SpotRequestInfo toSpotRequestInfo(SpotRequestEntity entity) {
+        return SpotServiceDto.SpotRequestInfo.builder()
+                .id(entity.getId())
+                .userId(entity.getUser().getId())
+                .placeId(entity.getPlaceId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .imageUrl(entity.getImageUrl())
+                .latitude(entity.getLatitude())
+                .longitude(entity.getLongitude())
+                .address(entity.getAddress())
+                .region(entity.getRegion())
+                .city(entity.getCity())
+                .town(entity.getTown())
+                .postalCode(entity.getPostalCode())
+                .status(entity.getStatus().name())
+                .rejectReason(entity.getRejectReason())
+                .spotId(entity.getSpot() != null ? entity.getSpot().getId() : null)
+                .createdAt(entity.getCreatedAt())
+                .build();
     }
 
     // ── spot_address CRUD ─────────────────────────────────────
