@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.web.bind.annotation.PatchMapping;
+
 @Tag(name = "Spot", description = "스팟 API")
 @RestController
 @RequiredArgsConstructor
@@ -51,6 +53,26 @@ public class SpotController {
             @RequestBody SpotServiceDto.SpotCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(spotService.createSpot(request)));
+    }
+
+    // ── 스팟 신청 ─────────────────────────────────────────────
+
+    @Operation(summary = "스팟 등록 신청", description = "회원 전용. 어드민 승인 후 spots에 저장됨")
+    @PostMapping("/spot-requests")
+    public ResponseEntity<ApiResponse<SpotServiceDto.SpotRequestInfo>> createSpotRequest(
+            @RequestBody SpotServiceDto.SpotRequestCreateRequest request,
+            @CurrentUserId Long userId) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(spotService.createSpotRequest(request, userId)));
+    }
+
+    @Operation(summary = "스팟 신청 검토", description = "어드민 전용. status: APPROVED or REJECTED")
+    @PatchMapping("/spot-requests/{id}")
+    public ResponseEntity<ApiResponse<SpotServiceDto.SpotRequestInfo>> reviewSpotRequest(
+            @PathVariable Long id,
+            @RequestBody SpotServiceDto.SpotRequestReviewRequest request,
+            @CurrentUserId Long adminId) {
+        return ResponseEntity.ok(ApiResponse.success(spotService.reviewSpotRequest(id, adminId, request)));
     }
 
     // ── 주소 ──────────────────────────────────────────────────

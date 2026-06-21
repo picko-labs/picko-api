@@ -26,6 +26,8 @@ public enum ErrorCode {
     SPOT_ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "주소를 찾을 수 없습니다."),
     SPOT_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
     SPOT_CATEGORY_MAPPING_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리 매핑을 찾을 수 없습니다."),
+    SPOT_HASHTAG_NOT_FOUND(HttpStatus.NOT_FOUND, "해시태그를 찾을 수 없습니다."),
+    SPOT_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "스팟 신청을 찾을 수 없습니다."),
 
     // 500 Internal Server Error
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");

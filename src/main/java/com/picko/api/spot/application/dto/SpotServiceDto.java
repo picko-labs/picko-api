@@ -212,4 +212,128 @@ public class SpotServiceDto {
         private String icon;
         private Integer sortOrder;
     }
+
+    @Schema(description = "스팟 등록 신청 요청")
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SpotRequestCreateRequest {
+
+        @Schema(description = "Google Maps place_id (추후 연동용)", example = "ChIJN1t_tDeuEmsRUsoyG83frY4")
+        private String placeId;
+
+        @Schema(description = "장소명", example = "성수 카페거리")
+        private String name;
+
+        @Schema(description = "장소 소개 문구")
+        private String description;
+
+        @Schema(description = "대표 이미지 URL")
+        private String imageUrl;
+
+        @Schema(description = "위도", example = "37.5447700")
+        private BigDecimal latitude;
+
+        @Schema(description = "경도", example = "127.0557800")
+        private BigDecimal longitude;
+
+        @Schema(description = "기본주소")
+        private String address;
+
+        @Schema(description = "시/도", example = "서울특별시")
+        private String region;
+
+        @Schema(description = "시/군/구", example = "성동구")
+        private String city;
+
+        @Schema(description = "읍/면/동", example = "성수동")
+        private String town;
+
+        @Schema(description = "우편번호", example = "04783")
+        private String postalCode;
+    }
+
+    @Schema(description = "스팟 신청 검토 요청 (승인 / 반려)")
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SpotRequestReviewRequest {
+
+        @Schema(description = "처리 상태", example = "APPROVED or REJECTED")
+        private String status;
+
+        @Schema(description = "주소 코드 (승인 시 필수, 예: seongsu)", example = "seongsu")
+        private String addressCode;
+
+        @Schema(description = "카테고리 ID 목록 (승인 시)")
+        private List<Long> categoryIds;
+
+        @Schema(description = "해시태그 ID 목록 (승인 시)")
+        private List<Long> hashtagIds;
+
+        @Schema(description = "트렌딩 여부 (승인 시, 기본값 false)")
+        private Boolean isTrending;
+
+        @Schema(description = "반려 사유 (반려 시)")
+        private String rejectReason;
+    }
+
+    @Schema(description = "스팟 신청 내역")
+    @Getter
+    @Builder
+    public static class SpotRequestInfo {
+
+        @Schema(description = "신청 ID")
+        private Long id;
+
+        @Schema(description = "신청 사용자 ID")
+        private Long userId;
+
+        @Schema(description = "Google Maps place_id")
+        private String placeId;
+
+        @Schema(description = "장소명")
+        private String name;
+
+        @Schema(description = "장소 소개 문구")
+        private String description;
+
+        @Schema(description = "대표 이미지 URL")
+        private String imageUrl;
+
+        @Schema(description = "위도")
+        private BigDecimal latitude;
+
+        @Schema(description = "경도")
+        private BigDecimal longitude;
+
+        @Schema(description = "기본주소")
+        private String address;
+
+        @Schema(description = "시/도")
+        private String region;
+
+        @Schema(description = "시/군/구")
+        private String city;
+
+        @Schema(description = "읍/면/동")
+        private String town;
+
+        @Schema(description = "우편번호")
+        private String postalCode;
+
+        @Schema(description = "처리 상태 (PENDING | APPROVED | REJECTED)")
+        private String status;
+
+        @Schema(description = "반려 사유")
+        private String rejectReason;
+
+        @Schema(description = "승인된 스팟 ID")
+        private Long spotId;
+
+        @Schema(description = "신청 일시")
+        private LocalDateTime createdAt;
+    }
 }

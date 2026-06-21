@@ -3,6 +3,7 @@ package com.picko.api.spot.domain;
 import com.picko.api.common.domain.BaseEntity;
 import com.picko.api.spot.domain.id.SpotHashtagMappingId;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,4 +35,10 @@ public class SpotHashtagMappingEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spot_hashtag_id")
     private SpotHashtagEntity spotHashtag;
+
+    public SpotHashtagMappingEntity(SpotEntity spot, SpotHashtagEntity spotHashtag) {
+        this.id = new SpotHashtagMappingId(spot.getId(), spotHashtag.getId());
+        this.spot = spot;
+        this.spotHashtag = spotHashtag;
+    }
 }
