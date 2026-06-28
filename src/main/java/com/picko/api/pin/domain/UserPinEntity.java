@@ -7,7 +7,6 @@ import org.hibernate.annotations.SQLDelete;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * user_pins 테이블
@@ -21,7 +20,6 @@ import lombok.Setter;
 @Table(name = "user_pins")
 @SQLDelete(sql = "UPDATE user_pins SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @NoArgsConstructor
 public class UserPinEntity extends BaseEntity {
 
@@ -44,4 +42,16 @@ public class UserPinEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_pin_category_id")
     private UserPinCategoryEntity userPinCategory;
+
+    public static UserPinEntity create(UserEntity user, SpotEntity spot, UserPinCategoryEntity category) {
+        UserPinEntity entity = new UserPinEntity();
+        entity.user = user;
+        entity.spot = spot;
+        entity.userPinCategory = category;
+        return entity;
+    }
+
+    public void changeCategory(UserPinCategoryEntity category) {
+        this.userPinCategory = category;
+    }
 }
