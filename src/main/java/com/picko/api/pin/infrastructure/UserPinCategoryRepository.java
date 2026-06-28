@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface UserPinCategoryRepository extends JpaRepository<UserPinCategoryEntity, Long> {
 
-    List<UserPinCategoryEntity> findByUserIdOrderBySortOrderAsc(Long userId);
+    List<UserPinCategoryEntity> findByUserIdAndDeletedAtIsNullOrderBySortOrderAsc(Long userId);
 }
