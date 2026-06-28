@@ -280,6 +280,69 @@ public class SpotServiceDto {
         private String rejectReason;
     }
 
+    @Schema(description = "트렌딩 스팟 아이템 (Nearby / Nationality 공통)")
+    @Getter
+    @Builder
+    public static class TrendingSpotItem {
+
+        @Schema(description = "스팟 ID")
+        private Long id;
+
+        @Schema(description = "장소명")
+        private String name;
+
+        @Schema(description = "대표 이미지 URL")
+        private String imageUrl;
+
+        @Schema(description = "트렌딩 여부")
+        private Boolean isTrending;
+
+        @Schema(description = "위도")
+        private BigDecimal latitude;
+
+        @Schema(description = "경도")
+        private BigDecimal longitude;
+
+        @Schema(description = "카테고리 목록")
+        private List<CategoryInfo> categories;
+
+        @Schema(description = "핀 수")
+        private Long pinCount;
+
+        @Schema(description = "요청 사용자의 핀 여부 (비회원은 항상 false)")
+        private Boolean isPinned;
+
+        @Schema(description = "현재 위치로부터의 거리 (km)")
+        private Double distanceKm;
+    }
+
+    @Schema(description = "Trending Nearby 페이지 응답")
+    @Getter
+    @Builder
+    public static class TrendingNearbyPage {
+
+        @Schema(description = "스팟 목록")
+        private List<TrendingSpotItem> items;
+
+        @Schema(description = "다음 페이지 존재 여부")
+        private boolean hasNext;
+    }
+
+    @Schema(description = "Trending Nationality 페이지 응답")
+    @Getter
+    @Builder
+    public static class TrendingNationalityPage {
+
+        @Schema(description = "스팟 목록")
+        private List<TrendingSpotItem> items;
+
+        @Schema(description = "다음 페이지 존재 여부")
+        private boolean hasNext;
+
+        @Schema(description = "적용된 국적 코드 (ISO 3166-1 alpha-2, 예: KR, US, JP)")
+        private String nationality;
+    }
+
     @Schema(description = "스팟 신청 내역")
     @Getter
     @Builder

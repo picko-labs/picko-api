@@ -25,6 +25,32 @@ public class SpotController {
 
     // ── 스팟 ──────────────────────────────────────────────────
 
+    @Operation(summary = "Trending Nearby 목록 조회", description = "현재 위치 기반 반경 내 트렌딩 스팟 추천. 비회원 호출 가능. 회원이면 isPinned 포함")
+    @GetMapping("/spots/trending-nearby")
+    public ResponseEntity<ApiResponse<SpotServiceDto.TrendingNearbyPage>> getTrendingNearbySpots(
+            @RequestParam BigDecimal lat,
+            @RequestParam BigDecimal lng,
+            @RequestParam(defaultValue = "3.0") double radius,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @CurrentUserId Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(
+                spotService.getTrendingNearby(lat, lng, radius, page, size, userId)));
+    }
+
+    @Operation(summary = "Trending Nationality 목록 조회", description = "현재 위치 기반 반경 내, 동일 국적 유저 핀 기준 트렌딩 스팟 추천. 비회원은 KR 기본 적용")
+    @GetMapping("/spots/trending-nationality")
+    public ResponseEntity<ApiResponse<SpotServiceDto.TrendingNationalityPage>> getTrendingNationalitySpots(
+            @RequestParam BigDecimal lat,
+            @RequestParam BigDecimal lng,
+            @RequestParam(defaultValue = "3.0") double radius,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @CurrentUserId Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(
+                spotService.getTrendingByNationality(lat, lng, radius, page, size, userId)));
+    }
+
     @Operation(summary = "스팟 목록 조회", description = "비회원 호출 가능. 회원이면 isPinned 개인화 포함")
     @GetMapping("/spots")
     public ResponseEntity<ApiResponse<List<SpotServiceDto.ListItem>>> getSpots(
