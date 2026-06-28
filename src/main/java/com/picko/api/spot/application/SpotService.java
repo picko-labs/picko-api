@@ -21,20 +21,28 @@ import com.picko.api.spot.infrastructure.SpotHashtagMappingRepository;
 import com.picko.api.spot.infrastructure.SpotHashtagRepository;
 import com.picko.api.spot.infrastructure.SpotRepository;
 import com.picko.api.spot.infrastructure.SpotRequestRepository;
+import com.picko.api.spot.infrastructure.SpotTrendingProjection;
 import com.picko.api.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SpotService {
+
+    private static final long MIN_TRENDING_PIN_COUNT = 5;
 
     private final SpotRepository spotRepository;
     private final SpotAddressRepository spotAddressRepository;
@@ -78,6 +86,107 @@ public class SpotService {
         boolean isPinned = userId != null
                 && userPinRepository.existsByUserIdAndSpotIdAndDeletedAtIsNull(userId, id);
         return toDetail(spot, isPinned);
+    }
+
+    /**
+     * 현재 위치 기반 반경 내 트렌딩 스팟을 반환한다.
+     * pinCount >= MIN_TRENDING_PIN_COUNT 조건을 만족하는 스팟을 pinCount 내림차순으로 페이징한다.
+     */
+    public SpotServiceDto.TrendingNearbyPage getTrendingNearby(
+            BigDecimal centerLat, BigDecimal centerLng, double radiusKm,
+            int page, int size, Long userId) {
+
+        List<SpotTrendingProjection> projections = spotRepository.findTrendingNearby(
+                centerLat, centerLng, radiusKm, MIN_TRENDING_PIN_COUNT,
+                PageRequest.of(page, size + 1));
+
+        boolean hasNext = projections.size() > size;
+        List<SpotTrendingProjection> pageData = hasNext ? projections.subList(0, size) : projections;
+
+        Set<Long> pinnedSpotIds = pinnedSpotIdsOf(userId);
+        List<Long> spotIds = pageData.stream().map(SpotTrendingProjection::getId).toList();
+        Map<Long, SpotEntity> spotMap = spotRepository.findAllById(spotIds).stream()
+                .collect(Collectors.toMap(SpotEntity::getId, s -> s));
+
+        List<SpotServiceDto.TrendingSpotItem> items = pageData.stream()
+                .map(p -> {
+                    SpotEntity spot = spotMap.get(p.getId());
+                    return spot == null ? null : toTrendingSpotItem(
+                            spot, p.getPinCount(), pinnedSpotIds.contains(p.getId()), p.getDistanceKm());
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        return SpotServiceDto.TrendingNearbyPage.builder()
+                .items(items)
+                .hasNext(hasNext)
+                .build();
+    }
+
+    private static final String DEFAULT_NATIONALITY = "KR";
+
+    public SpotServiceDto.TrendingNationalityPage getTrendingByNationality(
+            BigDecimal centerLat, BigDecimal centerLng, double radiusKm,
+            int page, int size, Long userId) {
+
+        String nationality = DEFAULT_NATIONALITY;
+        if (userId != null) {
+            String userNationality = userRepository.findById(userId)
+                    .map(u -> u.getNationality())
+                    .orElse(null);
+            if (userNationality != null) {
+                nationality = userNationality;
+            }
+        }
+
+        List<SpotTrendingProjection> projections = spotRepository.findTrendingByNationality(
+                centerLat, centerLng, radiusKm, nationality, MIN_TRENDING_PIN_COUNT,
+                PageRequest.of(page, size + 1));
+
+        boolean hasNext = projections.size() > size;
+        List<SpotTrendingProjection> pageData = hasNext ? projections.subList(0, size) : projections;
+
+        Set<Long> pinnedSpotIds = pinnedSpotIdsOf(userId);
+        List<Long> spotIds = pageData.stream().map(SpotTrendingProjection::getId).toList();
+        Map<Long, SpotEntity> spotMap = spotRepository.findAllById(spotIds).stream()
+                .collect(Collectors.toMap(SpotEntity::getId, s -> s));
+
+        List<SpotServiceDto.TrendingSpotItem> items = pageData.stream()
+                .map(p -> {
+                    SpotEntity spot = spotMap.get(p.getId());
+                    return spot == null ? null : toTrendingSpotItem(
+                            spot, p.getPinCount(), pinnedSpotIds.contains(p.getId()), p.getDistanceKm());
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        return SpotServiceDto.TrendingNationalityPage.builder()
+                .items(items)
+                .hasNext(hasNext)
+                .nationality(nationality)
+                .build();
+    }
+
+    private SpotServiceDto.TrendingSpotItem toTrendingSpotItem(
+            SpotEntity spot, long pinCount, boolean isPinned, double distanceKm) {
+        List<SpotServiceDto.CategoryInfo> categories = categoryMappingRepository
+                .findByIdSpotId(spot.getId())
+                .stream()
+                .map(m -> toCategoryInfo(m.getSpotCategory()))
+                .toList();
+        var coordinate = spot.getSpotAddress() != null ? spot.getSpotAddress().getCoordinate() : null;
+        return SpotServiceDto.TrendingSpotItem.builder()
+                .id(spot.getId())
+                .name(spot.getName())
+                .imageUrl(spot.getImageUrl())
+                .isTrending(spot.getIsTrending())
+                .latitude(coordinate != null ? coordinate.getLatitude() : null)
+                .longitude(coordinate != null ? coordinate.getLongitude() : null)
+                .categories(categories)
+                .pinCount(pinCount)
+                .isPinned(isPinned)
+                .distanceKm(distanceKm)
+                .build();
     }
 
     /** 회원이면 핀한 spotId 집합을, 비회원이면 빈 집합을 반환한다 (개인화 isPinned 판정용). */
