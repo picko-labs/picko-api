@@ -70,24 +70,42 @@ VALUES
      '에메랄드빛 바다와 비양도 전망이 어우러진 제주 서쪽 대표 해변.',
      'https://example.com/images/hyeopjae.jpg', 0, NULL, NULL);
 
--- ── spot_categories 기준 데이터 (없으면 삽입) ──────────────────
-INSERT IGNORE INTO spot_categories (code, name, icon, sort_order) VALUES
-    ('cafe',      'Cafe',      '☕',  1),
-    ('food',      'Food',      '🍜',  2),
-    ('shopping',  'Shopping',  '🛍️', 3),
-    ('culture',   'Culture',   '🎭',  4),
-    ('nightlife', 'Nightlife', '🍸',  5);
+-- ── spot_categories 계층 구조 (재실행 가능 — 매핑·카테고리 초기화 후 재삽입) ──
+DELETE FROM spot_category_mappings;
+DELETE FROM spot_categories;
 
--- ── spot_category_mappings ────────────────────────────────────
+-- 루트 카테고리 (parent_id NULL)
+INSERT INTO spot_categories (code, name, icon, sort_order) VALUES
+    ('food_drink',    'Food & Drink',  '🍽️', 1),
+    ('lifestyle',     'Lifestyle',     '✨',  2),
+    ('entertainment', 'Entertainment', '🎉',  3);
+
+-- 자식 카테고리 (parent_id = 루트 카테고리 id)
+INSERT INTO spot_categories (code, name, icon, sort_order, parent_id)
+SELECT 'cafe', 'Cafe', '☕', 1, id FROM spot_categories WHERE code = 'food_drink';
+
+INSERT INTO spot_categories (code, name, icon, sort_order, parent_id)
+SELECT 'food', 'Food', '🍜', 2, id FROM spot_categories WHERE code = 'food_drink';
+
+INSERT INTO spot_categories (code, name, icon, sort_order, parent_id)
+SELECT 'shopping', 'Shopping', '🛍️', 1, id FROM spot_categories WHERE code = 'lifestyle';
+
+INSERT INTO spot_categories (code, name, icon, sort_order, parent_id)
+SELECT 'culture', 'Culture', '🎭', 1, id FROM spot_categories WHERE code = 'entertainment';
+
+INSERT INTO spot_categories (code, name, icon, sort_order, parent_id)
+SELECT 'nightlife', 'Nightlife', '🍸', 2, id FROM spot_categories WHERE code = 'entertainment';
+
+-- ── spot_category_mappings (리프 카테고리로 매핑) ─────────────────
 INSERT INTO spot_category_mappings (spot_id, spot_category_id)
 VALUES
     -- 성수 카페거리: cafe, culture
-    ((SELECT id FROM spots WHERE name = '성수 카페거리'),   (SELECT id FROM spot_categories WHERE code = 'cafe')),
-    ((SELECT id FROM spots WHERE name = '성수 카페거리'),   (SELECT id FROM spot_categories WHERE code = 'culture')),
+    ((SELECT id FROM spots WHERE name = '성수 카페거리'),    (SELECT id FROM spot_categories WHERE code = 'cafe')),
+    ((SELECT id FROM spots WHERE name = '성수 카페거리'),    (SELECT id FROM spot_categories WHERE code = 'culture')),
 
     -- 익선동 한옥마을: cafe, culture
-    ((SELECT id FROM spots WHERE name = '익선동 한옥마을'), (SELECT id FROM spot_categories WHERE code = 'cafe')),
-    ((SELECT id FROM spots WHERE name = '익선동 한옥마을'), (SELECT id FROM spot_categories WHERE code = 'culture')),
+    ((SELECT id FROM spots WHERE name = '익선동 한옥마을'),  (SELECT id FROM spot_categories WHERE code = 'cafe')),
+    ((SELECT id FROM spots WHERE name = '익선동 한옥마을'),  (SELECT id FROM spot_categories WHERE code = 'culture')),
 
     -- 연남동 경의선숲길: cafe, food
     ((SELECT id FROM spots WHERE name = '연남동 경의선숲길'), (SELECT id FROM spot_categories WHERE code = 'cafe')),
@@ -102,19 +120,19 @@ VALUES
     ((SELECT id FROM spots WHERE name = '한남동 유엔빌리지'), (SELECT id FROM spot_categories WHERE code = 'food')),
 
     -- 인사동 쌈지길: culture, shopping
-    ((SELECT id FROM spots WHERE name = '인사동 쌈지길'),   (SELECT id FROM spot_categories WHERE code = 'culture')),
-    ((SELECT id FROM spots WHERE name = '인사동 쌈지길'),   (SELECT id FROM spot_categories WHERE code = 'shopping')),
+    ((SELECT id FROM spots WHERE name = '인사동 쌈지길'),    (SELECT id FROM spot_categories WHERE code = 'culture')),
+    ((SELECT id FROM spots WHERE name = '인사동 쌈지길'),    (SELECT id FROM spot_categories WHERE code = 'shopping')),
 
     -- 망원동 망리단길: cafe, food
-    ((SELECT id FROM spots WHERE name = '망원동 망리단길'), (SELECT id FROM spot_categories WHERE code = 'cafe')),
-    ((SELECT id FROM spots WHERE name = '망원동 망리단길'), (SELECT id FROM spot_categories WHERE code = 'food')),
+    ((SELECT id FROM spots WHERE name = '망원동 망리단길'),  (SELECT id FROM spot_categories WHERE code = 'cafe')),
+    ((SELECT id FROM spots WHERE name = '망원동 망리단길'),  (SELECT id FROM spot_categories WHERE code = 'food')),
 
     -- 압구정 로데오거리: shopping
     ((SELECT id FROM spots WHERE name = '압구정 로데오거리'), (SELECT id FROM spot_categories WHERE code = 'shopping')),
 
     -- 광안리해수욕장: food, nightlife
-    ((SELECT id FROM spots WHERE name = '광안리해수욕장'),  (SELECT id FROM spot_categories WHERE code = 'food')),
-    ((SELECT id FROM spots WHERE name = '광안리해수욕장'),  (SELECT id FROM spot_categories WHERE code = 'nightlife')),
+    ((SELECT id FROM spots WHERE name = '광안리해수욕장'),   (SELECT id FROM spot_categories WHERE code = 'food')),
+    ((SELECT id FROM spots WHERE name = '광안리해수욕장'),   (SELECT id FROM spot_categories WHERE code = 'nightlife')),
 
     -- 협재해변: culture
-    ((SELECT id FROM spots WHERE name = '협재해변'),        (SELECT id FROM spot_categories WHERE code = 'culture'));
+    ((SELECT id FROM spots WHERE name = '협재해변'),         (SELECT id FROM spot_categories WHERE code = 'culture'));
