@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Pin", description = "핀 API")
+@Tag(name = "미연동용 | Pin")
 @RestController
 @RequiredArgsConstructor
 public class PinController {
@@ -20,21 +20,21 @@ public class PinController {
 
     // ── user_pin_categories ───────────────────────────────────
 
-    @Operation(summary = "핀 카테고리 목록 조회", description = "내부용")
+    @Operation(summary = "핀 카테고리 목록 조회")
     @GetMapping("/user-pin-categories")
     public ResponseEntity<List<PinServiceDto.UserPinCategoryInfo>> getUserPinCategories(
             @RequestParam Long userId) {
         return ResponseEntity.ok(pinService.getUserPinCategories(userId));
     }
 
-    @Operation(summary = "핀 카테고리 생성", description = "내부용")
+    @Operation(summary = "핀 카테고리 생성")
     @PostMapping("/user-pin-categories")
     public ResponseEntity<PinServiceDto.UserPinCategoryInfo> createUserPinCategory(
             @RequestBody PinServiceDto.UserPinCategoryCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pinService.createUserPinCategory(request));
     }
 
-    @Operation(summary = "핀 카테고리 수정", description = "내부용")
+    @Operation(summary = "핀 카테고리 수정")
     @PutMapping("/user-pin-categories/{id}")
     public ResponseEntity<PinServiceDto.UserPinCategoryInfo> updateUserPinCategory(
             @PathVariable Long id,
@@ -42,7 +42,7 @@ public class PinController {
         return ResponseEntity.ok(pinService.updateUserPinCategory(id, request));
     }
 
-    @Operation(summary = "핀 카테고리 삭제", description = "내부용")
+    @Operation(summary = "핀 카테고리 삭제")
     @DeleteMapping("/user-pin-categories/{id}")
     public ResponseEntity<Void> deleteUserPinCategory(@PathVariable Long id) {
         pinService.deleteUserPinCategory(id);
@@ -51,21 +51,21 @@ public class PinController {
 
     // ── user_pins ─────────────────────────────────────────────
 
-    @Operation(summary = "핀 목록 조회", description = "내부용")
+    @Operation(summary = "핀 목록 조회", tags = {"연동용 | Pin"})
     @GetMapping("/user-pins")
     public ResponseEntity<List<PinServiceDto.UserPinInfo>> getUserPins(
             @RequestParam Long userId) {
         return ResponseEntity.ok(pinService.getUserPins(userId));
     }
 
-    @Operation(summary = "핀 생성", description = "내부용")
+    @Operation(summary = "핀 생성", tags = {"연동용 | Pin"})
     @PostMapping("/user-pins")
     public ResponseEntity<PinServiceDto.UserPinInfo> createUserPin(
             @RequestBody PinServiceDto.UserPinCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pinService.createUserPin(request));
     }
 
-    @Operation(summary = "핀 수정", description = "내부용")
+    @Operation(summary = "핀 수정", tags = {"연동용 | Pin"})
     @PutMapping("/user-pins/{id}")
     public ResponseEntity<PinServiceDto.UserPinInfo> updateUserPin(
             @PathVariable Long id,
@@ -73,7 +73,7 @@ public class PinController {
         return ResponseEntity.ok(pinService.updateUserPin(id, request));
     }
 
-    @Operation(summary = "핀 삭제", description = "내부용")
+    @Operation(summary = "핀 삭제", tags = {"연동용 | Pin"})
     @DeleteMapping("/user-pins/{id}")
     public ResponseEntity<Void> deleteUserPin(@PathVariable Long id) {
         pinService.deleteUserPin(id);

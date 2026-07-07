@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.PatchMapping;
 
-@Tag(name = "Spot", description = "스팟 API")
+@Tag(name = "미연동용 | Spot")
 @RestController
 @RequiredArgsConstructor
 public class SpotController {
@@ -25,7 +25,7 @@ public class SpotController {
 
     // ── 스팟 ──────────────────────────────────────────────────
 
-    @Operation(summary = "스팟 목록 조회", description = "비회원 호출 가능. 회원이면 isPinned 개인화 포함")
+    @Operation(summary = "스팟 목록 조회", description = "비회원 호출 가능. 회원이면 isPinned 개인화 포함", tags = {"연동용 | Spot"})
     @GetMapping("/spots")
     public ResponseEntity<ApiResponse<List<SpotServiceDto.ListItem>>> getSpots(
             @RequestParam BigDecimal swLat,
@@ -39,7 +39,7 @@ public class SpotController {
         return ResponseEntity.ok(ApiResponse.success(spotService.getSpots(request, userId)));
     }
 
-    @Operation(summary = "스팟 상세 조회", description = "비회원 호출 가능. 회원이면 isPinned 개인화 포함")
+    @Operation(summary = "스팟 상세 조회", description = "비회원 호출 가능. 회원이면 isPinned 개인화 포함", tags = {"연동용 | Spot"})
     @GetMapping("/spots/{id}")
     public ResponseEntity<ApiResponse<SpotServiceDto.Detail>> getSpot(
             @PathVariable Long id,
@@ -47,7 +47,7 @@ public class SpotController {
         return ResponseEntity.ok(ApiResponse.success(spotService.getSpot(id, userId)));
     }
 
-    @Operation(summary = "스팟 저장", description = "연동용")
+    @Operation(summary = "스팟 저장", tags = {"연동용 | Spot"})
     @PostMapping("/spots")
     public ResponseEntity<ApiResponse<SpotServiceDto.Detail>> createSpot(
             @RequestBody SpotServiceDto.SpotCreateRequest request) {
@@ -57,7 +57,7 @@ public class SpotController {
 
     // ── 스팟 신청 ─────────────────────────────────────────────
 
-    @Operation(summary = "스팟 등록 신청", description = "회원 전용. 어드민 승인 후 spots에 저장됨")
+    @Operation(summary = "스팟 등록 신청", description = "회원 전용. 어드민 승인 후 spots에 저장됨", tags = {"연동용 | Spot"})
     @PostMapping("/spot-requests")
     public ResponseEntity<ApiResponse<SpotServiceDto.SpotRequestInfo>> createSpotRequest(
             @RequestBody SpotServiceDto.SpotRequestCreateRequest request,
@@ -77,13 +77,13 @@ public class SpotController {
 
     // ── 주소 ──────────────────────────────────────────────────
 
-    @Operation(summary = "주소 목록 조회", description = "내부용")
+    @Operation(summary = "주소 목록 조회", tags = {"미연동용 | Spot Addresses"})
     @GetMapping("/spot-addresses")
     public ResponseEntity<ApiResponse<List<SpotServiceDto.AddressInfo>>> getSpotAddresses() {
         return ResponseEntity.ok(ApiResponse.success(spotService.getSpotAddresses()));
     }
 
-    @Operation(summary = "주소 생성", description = "내부용")
+    @Operation(summary = "주소 생성", tags = {"미연동용 | Spot Addresses"})
     @PostMapping("/spot-addresses")
     public ResponseEntity<ApiResponse<SpotServiceDto.AddressInfo>> createSpotAddress(
             @RequestBody SpotServiceDto.SpotAddressRequest request) {
@@ -91,7 +91,7 @@ public class SpotController {
                 .body(ApiResponse.success(spotService.createSpotAddress(request)));
     }
 
-    @Operation(summary = "주소 수정", description = "내부용")
+    @Operation(summary = "주소 수정", tags = {"미연동용 | Spot Addresses"})
     @PutMapping("/spot-addresses/{id}")
     public ResponseEntity<ApiResponse<SpotServiceDto.AddressInfo>> updateSpotAddress(
             @PathVariable Long id,
@@ -99,7 +99,7 @@ public class SpotController {
         return ResponseEntity.ok(ApiResponse.success(spotService.updateSpotAddress(id, request)));
     }
 
-    @Operation(summary = "주소 삭제", description = "내부용")
+    @Operation(summary = "주소 삭제", tags = {"미연동용 | Spot Addresses"})
     @DeleteMapping("/spot-addresses/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSpotAddress(@PathVariable Long id) {
         spotService.deleteSpotAddress(id);
@@ -108,13 +108,13 @@ public class SpotController {
 
     // ── 카테고리 ──────────────────────────────────────────────
 
-    @Operation(summary = "카테고리 목록 조회", description = "내부용")
+    @Operation(summary = "카테고리 목록 조회", tags = {"연동용 | Spot Categories"})
     @GetMapping("/spot-categories")
     public ResponseEntity<ApiResponse<List<SpotServiceDto.CategoryInfo>>> getSpotCategories() {
         return ResponseEntity.ok(ApiResponse.success(spotService.getSpotCategories()));
     }
 
-    @Operation(summary = "카테고리 생성", description = "내부용")
+    @Operation(summary = "카테고리 생성", tags = {"미연동용 | Spot Categories"})
     @PostMapping("/spot-categories")
     public ResponseEntity<ApiResponse<SpotServiceDto.CategoryInfo>> createSpotCategory(
             @RequestBody SpotServiceDto.SpotCategoryRequest request) {
@@ -122,7 +122,7 @@ public class SpotController {
                 .body(ApiResponse.success(spotService.createSpotCategory(request)));
     }
 
-    @Operation(summary = "카테고리 수정", description = "내부용")
+    @Operation(summary = "카테고리 수정", tags = {"미연동용 | Spot Categories"})
     @PutMapping("/spot-categories/{id}")
     public ResponseEntity<ApiResponse<SpotServiceDto.CategoryInfo>> updateSpotCategory(
             @PathVariable Long id,
@@ -130,7 +130,7 @@ public class SpotController {
         return ResponseEntity.ok(ApiResponse.success(spotService.updateSpotCategory(id, request)));
     }
 
-    @Operation(summary = "카테고리 삭제", description = "내부용")
+    @Operation(summary = "카테고리 삭제", tags = {"미연동용 | Spot Categories"})
     @DeleteMapping("/spot-categories/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSpotCategory(@PathVariable Long id) {
         spotService.deleteSpotCategory(id);
@@ -139,7 +139,7 @@ public class SpotController {
 
     // ── 카테고리 매핑 ─────────────────────────────────────────
 
-    @Operation(summary = "스팟에 카테고리 연결", description = "내부용")
+    @Operation(summary = "스팟에 카테고리 연결", tags = {"미연동용 | Spot Categories"})
     @PostMapping("/spots/{spotId}/categories/{categoryId}")
     public ResponseEntity<ApiResponse<Void>> addCategoryToSpot(
             @PathVariable Long spotId,
@@ -148,7 +148,7 @@ public class SpotController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<Void>success(null));
     }
 
-    @Operation(summary = "스팟에서 카테고리 연결 해제", description = "내부용")
+    @Operation(summary = "스팟에서 카테고리 연결 해제", tags = {"미연동용 | Spot Categories"})
     @DeleteMapping("/spots/{spotId}/categories/{categoryId}")
     public ResponseEntity<ApiResponse<Void>> removeCategoryFromSpot(
             @PathVariable Long spotId,
