@@ -98,18 +98,21 @@ CREATE TABLE spot_address (
 -- ────────────────────────────────────────────────────────────
 CREATE TABLE spot_categories (
     id         BIGINT       NOT NULL AUTO_INCREMENT  COMMENT '카테고리 고유 식별자 (PK)',
-    code       VARCHAR(50)  NOT NULL                 COMMENT '카테고리 코드 — 영문 소문자 (예: cafe, food, shopping, culture, nightlife). 프로그래밍 식별자로 사용',
-    name       VARCHAR(100) NOT NULL                 COMMENT '카테고리 표시명 (예: Cafe, Food, Shopping)',
-    icon       VARCHAR(50)  NULL                     COMMENT '카테고리 대표 아이콘 — 이모지 또는 아이콘 키 (예: ☕, 🍜)',
+    parent_id  BIGINT       NULL                     COMMENT '상위 카테고리 — spot_categories.id 자기참조. NULL이면 1단계(루트)',
+    code       VARCHAR(50)  NOT NULL                 COMMENT '카테고리 코드 — 영문 소문자. 프로그래밍 식별자로 사용',
+    name       VARCHAR(100) NOT NULL                 COMMENT '카테고리 표시명',
+    icon       VARCHAR(50)  NULL                     COMMENT '카테고리 대표 아이콘 — 이모지 또는 아이콘 키',
     sort_order INT          NOT NULL DEFAULT 0       COMMENT '화면 노출 순서 (오름차순 정렬)',
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP             COMMENT '레코드 생성 일시',
     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
                    ON UPDATE CURRENT_TIMESTAMP                             COMMENT '레코드 최종 수정 일시',
     deleted_at TIMESTAMP    NULL                                            COMMENT '삭제 일시 (soft delete)',
     PRIMARY KEY (id),
-    UNIQUE KEY uq_spot_categories_code (code)
+    UNIQUE KEY uq_spot_categories_code (code),
+    KEY idx_spot_categories_parent (parent_id),
+    CONSTRAINT fk_spot_categories_parent FOREIGN KEY (parent_id) REFERENCES spot_categories (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-  COMMENT='장소 카테고리 (Cafe / Food / Shopping / Culture / Nightlife)';
+  COMMENT='장소 카테고리 — parent_id 자기참조로 계층 구조 표현 (서비스 레이어에서 최대 2단계 제한)';
 
 -- ────────────────────────────────────────────────────────────
 -- 5. spots
