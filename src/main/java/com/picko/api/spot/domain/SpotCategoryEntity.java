@@ -6,12 +6,15 @@ import org.hibernate.annotations.SQLDelete;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * spot_categories 테이블
  *
  * 목적: 장소 분류 카테고리 관리
- * 설명: 지도 상단 필터 칩 및 스팟 등록 폼의 카테고리 선택지로 사용된다.
- *       현재 정의된 값: Cafe, Food, Shopping, Culture, Nightlife
+ * 설명: parent_id 자기참조 FK 로 계층 구조를 표현한다.
+ *       서비스 레이어에서 최대 2단계(루트·자식)까지만 허용한다.
  */
 @Entity
 @Table(name = "spot_categories")
@@ -20,26 +23,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SpotCategoryEntity extends BaseEntity {
 
-    /** 카테고리 고유 식별자 (PK) */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** 카테고리 코드 — 영문 소문자 (예: cafe, food, shopping, culture, nightlife). 프로그래밍 식별자로 사용 */
     @Column(nullable = false, unique = true, length = 50)
     private String code;
 
-    /** 카테고리 표시명 (예: Cafe, Food, Shopping) */
     @Column(nullable = false, length = 100)
     private String name;
 
-    /** 카테고리 대표 아이콘 — 이모지 또는 아이콘 키 (예: ☕, 🍜) */
     @Column(length = 50)
     private String icon;
 
-    /** 화면 노출 순서 (오름차순 정렬) */
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;
+
+    /** 상위 카테고리 — NULL이면 1단계(루트) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private SpotCategoryEntity parent;
+
+    /** 하위 카테고리 목록 — 최대 1단계 자식만 허용 (서비스 레이어 검증) */
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    private List<SpotCategoryEntity> children = new ArrayList<>();
 
     public static SpotCategoryEntity create(String code, String name, String icon, Integer sortOrder) {
         SpotCategoryEntity entity = new SpotCategoryEntity();
@@ -59,5 +66,9 @@ public class SpotCategoryEntity extends BaseEntity {
         if (sortOrder != null) {
             this.sortOrder = sortOrder;
         }
+    }
+
+    public void assignParent(SpotCategoryEntity parent) {
+        this.parent = parent;
     }
 }

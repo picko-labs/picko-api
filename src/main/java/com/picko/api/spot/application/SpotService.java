@@ -140,13 +140,26 @@ public class SpotService {
                 .build();
     }
 
-    /** 카테고리 엔티티를 응답 DTO로 변환한다. */
+    /** 카테고리 엔티티를 flat DTO로 변환한다 (스팟 목록·상세 응답용). */
     private SpotServiceDto.CategoryInfo toCategoryInfo(SpotCategoryEntity category) {
         return SpotServiceDto.CategoryInfo.builder()
                 .id(category.getId())
                 .code(category.getCode())
                 .name(category.getName())
                 .icon(category.getIcon())
+                .build();
+    }
+
+    /** 카테고리 엔티티를 자식 포함 트리 DTO로 변환한다 (카테고리 목록 조회용). */
+    private SpotServiceDto.CategoryInfo toTreeCategoryInfo(SpotCategoryEntity category) {
+        return SpotServiceDto.CategoryInfo.builder()
+                .id(category.getId())
+                .code(category.getCode())
+                .name(category.getName())
+                .icon(category.getIcon())
+                .children(category.getChildren().stream()
+                        .map(this::toCategoryInfo)
+                        .toList())
                 .build();
     }
 
@@ -341,29 +354,51 @@ public class SpotService {
 
     // ── spot_categories CRUD ──────────────────────────────────
 
-    /** 삭제되지 않은 전체 카테고리를 노출 순서대로 반환한다. */
+    /**
+     * 루트 카테고리 목록을 트리 구조로 반환한다.
+     * 각 루트 카테고리에 자식 카테고리(2단계)가 포함된다.
+     */
     public List<SpotServiceDto.CategoryInfo> getSpotCategories() {
-        return spotCategoryRepository.findAllByDeletedAtIsNullOrderBySortOrderAsc()
+        return spotCategoryRepository.findByParentIsNullOrderBySortOrderAsc()
                 .stream()
-                .map(this::toCategoryInfo)
+                .map(this::toTreeCategoryInfo)
                 .toList();
     }
 
-    /** 새 카테고리를 생성한다. */
+    /** 새 카테고리를 생성한다. parentId가 있으면 2단계 카테고리로 생성한다. */
     @Transactional
     public SpotServiceDto.CategoryInfo createSpotCategory(SpotServiceDto.SpotCategoryRequest request) {
+        SpotCategoryEntity parent = resolveParent(request.getParentId());
         SpotCategoryEntity entity = SpotCategoryEntity.create(
                 request.getCode(), request.getName(), request.getIcon(), request.getSortOrder());
+        if (parent != null) {
+            entity.assignParent(parent);
+        }
         return toCategoryInfo(spotCategoryRepository.save(entity));
     }
 
-    /** 기존 카테고리를 수정한다. */
+    /** 기존 카테고리를 수정한다. parentId 변경 시 깊이 재검증한다. */
     @Transactional
     public SpotServiceDto.CategoryInfo updateSpotCategory(Long id, SpotServiceDto.SpotCategoryRequest request) {
         SpotCategoryEntity entity = spotCategoryRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_CATEGORY_NOT_FOUND));
         entity.update(request.getCode(), request.getName(), request.getIcon(), request.getSortOrder());
+        entity.assignParent(resolveParent(request.getParentId()));
         return toCategoryInfo(entity);
+    }
+
+    /**
+     * parentId 로 상위 카테고리를 조회하고 최대 2단계 깊이를 검증한다.
+     * parentId == null 이면 루트 카테고리로 처리한다.
+     */
+    private SpotCategoryEntity resolveParent(Long parentId) {
+        if (parentId == null) return null;
+        SpotCategoryEntity parent = spotCategoryRepository.findById(parentId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SPOT_CATEGORY_NOT_FOUND));
+        if (parent.getParent() != null) {
+            throw new BusinessException(ErrorCode.SPOT_CATEGORY_DEPTH_EXCEEDED);
+        }
+        return parent;
     }
 
     /** 카테고리를 soft delete한다. */

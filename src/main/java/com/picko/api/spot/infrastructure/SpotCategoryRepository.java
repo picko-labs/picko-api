@@ -13,4 +13,7 @@ public interface SpotCategoryRepository extends JpaRepository<SpotCategoryEntity
     Optional<SpotCategoryEntity> findByCode(String code);
 
     List<SpotCategoryEntity> findAllByDeletedAtIsNullOrderBySortOrderAsc();
+
+    /** 1단계(루트) 카테고리만 반환 — 자식은 lazy loading 으로 접근 */
+    List<SpotCategoryEntity> findByParentIsNullOrderBySortOrderAsc();
 }

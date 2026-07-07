@@ -93,6 +93,8 @@ public class SpotServiceDto {
         private String code;
         private String name;
         private String icon;
+        /** 하위 카테고리 — 카테고리 목록 조회 시에만 채워짐, 스팟 응답에서는 null */
+        private List<CategoryInfo> children;
     }
 
     @Getter
@@ -207,6 +209,7 @@ public class SpotServiceDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SpotCategoryRequest {
+        private Long parentId;
         private String code;
         private String name;
         private String icon;
