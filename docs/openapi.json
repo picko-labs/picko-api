@@ -1,0 +1,1736 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Picko API",
+    "description" : "K-SPOT — 한국 트렌드 장소 탐색·공유 서비스 백엔드 API",
+    "version" : "v1.0.0"
+  },
+  "security" : [ {
+    "bearerAuth" : [ ]
+  } ],
+  "tags" : [ {
+    "name" : "연동용 | Auth",
+    "description" : "클라이언트 연동 · 인증"
+  }, {
+    "name" : "연동용 | Spot",
+    "description" : "클라이언트 연동 · 스팟"
+  }, {
+    "name" : "연동용 | Spot Categories",
+    "description" : "클라이언트 연동 · 스팟 카테고리"
+  }, {
+    "name" : "연동용 | User",
+    "description" : "클라이언트 연동 · 사용자"
+  }, {
+    "name" : "연동용 | Pin",
+    "description" : "클라이언트 연동 · 핀"
+  }, {
+    "name" : "미연동용 | Spot",
+    "description" : "내부/어드민 · 스팟 관리"
+  }, {
+    "name" : "미연동용 | Spot Categories",
+    "description" : "내부/어드민 · 스팟 카테고리 관리"
+  }, {
+    "name" : "미연동용 | Spot Addresses",
+    "description" : "내부/어드민 · 스팟 주소 관리"
+  }, {
+    "name" : "미연동용 | Pin",
+    "description" : "내부/어드민 · 핀 관리"
+  } ],
+  "paths" : {
+    "/user-pins/{id}" : {
+      "put" : {
+        "tags" : [ "미연동용 | Pin", "연동용 | Pin" ],
+        "summary" : "핀 수정",
+        "operationId" : "updateUserPin",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserPinUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserPinInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "미연동용 | Pin", "연동용 | Pin" ],
+        "summary" : "핀 삭제",
+        "operationId" : "deleteUserPin",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/user-pin-categories/{id}" : {
+      "put" : {
+        "tags" : [ "미연동용 | Pin" ],
+        "summary" : "핀 카테고리 수정",
+        "operationId" : "updateUserPinCategory",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserPinCategoryUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserPinCategoryInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "미연동용 | Pin" ],
+        "summary" : "핀 카테고리 삭제",
+        "operationId" : "deleteUserPinCategory",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/spot-categories/{id}" : {
+      "put" : {
+        "tags" : [ "미연동용 | Spot", "미연동용 | Spot Categories" ],
+        "summary" : "카테고리 수정",
+        "operationId" : "updateSpotCategory",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpotCategoryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseCategoryInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "미연동용 | Spot", "미연동용 | Spot Categories" ],
+        "summary" : "카테고리 삭제",
+        "operationId" : "deleteSpotCategory",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spot-addresses/{id}" : {
+      "put" : {
+        "tags" : [ "미연동용 | Spot Addresses", "미연동용 | Spot" ],
+        "summary" : "주소 수정",
+        "operationId" : "updateSpotAddress",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpotAddressRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseAddressInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "미연동용 | Spot Addresses", "미연동용 | Spot" ],
+        "summary" : "주소 삭제",
+        "operationId" : "deleteSpotAddress",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user-pins" : {
+      "get" : {
+        "tags" : [ "미연동용 | Pin", "연동용 | Pin" ],
+        "summary" : "핀 목록 조회",
+        "operationId" : "getUserPins",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserPinInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "미연동용 | Pin", "연동용 | Pin" ],
+        "summary" : "핀 생성",
+        "operationId" : "createUserPin",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserPinCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserPinInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user-pin-categories" : {
+      "get" : {
+        "tags" : [ "미연동용 | Pin" ],
+        "summary" : "핀 카테고리 목록 조회",
+        "operationId" : "getUserPinCategories",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserPinCategoryInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "미연동용 | Pin" ],
+        "summary" : "핀 카테고리 생성",
+        "operationId" : "createUserPinCategory",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserPinCategoryCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserPinCategoryInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spots" : {
+      "get" : {
+        "tags" : [ "미연동용 | Spot", "연동용 | Spot" ],
+        "summary" : "스팟 목록 조회",
+        "description" : "비회원 호출 가능. 회원이면 isPinned 개인화 포함",
+        "operationId" : "getSpots",
+        "parameters" : [ {
+          "name" : "swLat",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        }, {
+          "name" : "swLng",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        }, {
+          "name" : "neLat",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        }, {
+          "name" : "neLng",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        }, {
+          "name" : "categoryCode",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "userId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseListListItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "미연동용 | Spot", "연동용 | Spot" ],
+        "summary" : "스팟 저장",
+        "operationId" : "createSpot",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpotCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spots/{spotId}/categories/{categoryId}" : {
+      "post" : {
+        "tags" : [ "미연동용 | Spot", "미연동용 | Spot Categories" ],
+        "summary" : "스팟에 카테고리 연결",
+        "operationId" : "addCategoryToSpot",
+        "parameters" : [ {
+          "name" : "spotId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "미연동용 | Spot", "미연동용 | Spot Categories" ],
+        "summary" : "스팟에서 카테고리 연결 해제",
+        "operationId" : "removeCategoryFromSpot",
+        "parameters" : [ {
+          "name" : "spotId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spot-requests" : {
+      "post" : {
+        "tags" : [ "미연동용 | Spot", "연동용 | Spot" ],
+        "summary" : "스팟 등록 신청",
+        "description" : "회원 전용. 어드민 승인 후 spots에 저장됨",
+        "operationId" : "createSpotRequest",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpotRequestCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseSpotRequestInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spot-categories" : {
+      "get" : {
+        "tags" : [ "연동용 | Spot Categories", "미연동용 | Spot" ],
+        "summary" : "카테고리 목록 조회",
+        "operationId" : "getSpotCategories",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseListCategoryInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "미연동용 | Spot", "미연동용 | Spot Categories" ],
+        "summary" : "카테고리 생성",
+        "operationId" : "createSpotCategory",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpotCategoryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseCategoryInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spot-addresses" : {
+      "get" : {
+        "tags" : [ "미연동용 | Spot Addresses", "미연동용 | Spot" ],
+        "summary" : "주소 목록 조회",
+        "operationId" : "getSpotAddresses",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseListAddressInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "미연동용 | Spot Addresses", "미연동용 | Spot" ],
+        "summary" : "주소 생성",
+        "operationId" : "createSpotAddress",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpotAddressRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseAddressInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/{provider}" : {
+      "post" : {
+        "tags" : [ "연동용 | Auth" ],
+        "summary" : "소셜 로그인/회원가입",
+        "description" : "provider: google | apple | line",
+        "operationId" : "login",
+        "parameters" : [ {
+          "name" : "provider",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/OAuthLoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseTokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh" : {
+      "post" : {
+        "tags" : [ "연동용 | Auth" ],
+        "summary" : "Access Token 갱신",
+        "operationId" : "refresh",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseTokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout" : {
+      "post" : {
+        "tags" : [ "연동용 | Auth" ],
+        "summary" : "로그아웃",
+        "operationId" : "logout",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spot-requests/{id}" : {
+      "patch" : {
+        "tags" : [ "미연동용 | Spot" ],
+        "summary" : "스팟 신청 검토",
+        "description" : "어드민 전용. status: APPROVED or REJECTED",
+        "operationId" : "reviewSpotRequest",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "adminId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SpotRequestReviewRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseSpotRequestInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me" : {
+      "get" : {
+        "tags" : [ "연동용 | User" ],
+        "summary" : "내 정보 조회",
+        "operationId" : "getMe",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spots/{id}" : {
+      "get" : {
+        "tags" : [ "미연동용 | Spot", "연동용 | Spot" ],
+        "summary" : "스팟 상세 조회",
+        "description" : "비회원 호출 가능. 회원이면 isPinned 개인화 포함",
+        "operationId" : "getSpot",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "userId",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me" : {
+      "delete" : {
+        "tags" : [ "연동용 | Auth" ],
+        "summary" : "회원탈퇴",
+        "operationId" : "withdraw",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "UserPinUpdateRequest" : {
+        "type" : "object",
+        "description" : "핀 수정 요청",
+        "properties" : {
+          "userPinCategoryId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "핀 카테고리 ID (null이면 미분류로 변경)"
+          }
+        }
+      },
+      "UserPinInfo" : {
+        "type" : "object",
+        "description" : "핀 정보",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "핀 ID"
+          },
+          "userId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "사용자 ID"
+          },
+          "spotId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "스팟 ID"
+          },
+          "userPinCategoryId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "핀 카테고리 ID (null이면 미분류)"
+          }
+        }
+      },
+      "UserPinCategoryUpdateRequest" : {
+        "type" : "object",
+        "description" : "핀 카테고리 수정 요청",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "카테고리명"
+          },
+          "sortOrder" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "정렬 순서"
+          }
+        }
+      },
+      "UserPinCategoryInfo" : {
+        "type" : "object",
+        "description" : "핀 카테고리 정보",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "카테고리 ID"
+          },
+          "userId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "사용자 ID"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "카테고리명"
+          },
+          "sortOrder" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "정렬 순서"
+          }
+        }
+      },
+      "SpotCategoryRequest" : {
+        "type" : "object",
+        "properties" : {
+          "parentId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "icon" : {
+            "type" : "string"
+          },
+          "sortOrder" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "ApiResponseCategoryInfo" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/CategoryInfo",
+            "description" : "응답 데이터 (실패 시 null)"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "CategoryInfo" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "icon" : {
+            "type" : "string"
+          },
+          "children" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CategoryInfo"
+            }
+          }
+        }
+      },
+      "Error" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "에러 코드",
+            "example" : "SPOT_NOT_FOUND"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "에러 메시지"
+          }
+        }
+      },
+      "SpotAddressRequest" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "region" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "town" : {
+            "type" : "string"
+          },
+          "postalCode" : {
+            "type" : "string"
+          },
+          "address" : {
+            "type" : "string"
+          },
+          "addressDetail" : {
+            "type" : "string"
+          },
+          "latitude" : {
+            "type" : "number"
+          },
+          "longitude" : {
+            "type" : "number"
+          }
+        }
+      },
+      "AddressInfo" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "region" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "town" : {
+            "type" : "string"
+          },
+          "postalCode" : {
+            "type" : "string"
+          },
+          "address" : {
+            "type" : "string"
+          },
+          "addressDetail" : {
+            "type" : "string"
+          },
+          "latitude" : {
+            "type" : "number"
+          },
+          "longitude" : {
+            "type" : "number"
+          }
+        }
+      },
+      "ApiResponseAddressInfo" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/AddressInfo",
+            "description" : "응답 데이터 (실패 시 null)"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "UserPinCreateRequest" : {
+        "type" : "object",
+        "description" : "핀 생성 요청",
+        "properties" : {
+          "userId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "사용자 ID"
+          },
+          "spotId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "스팟 ID"
+          },
+          "userPinCategoryId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "핀 카테고리 ID (null이면 미분류)"
+          }
+        }
+      },
+      "UserPinCategoryCreateRequest" : {
+        "type" : "object",
+        "description" : "핀 카테고리 생성 요청",
+        "properties" : {
+          "userId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "사용자 ID"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "카테고리명"
+          },
+          "sortOrder" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "정렬 순서"
+          }
+        }
+      },
+      "SpotCreateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "spotAddressId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "imageUrl" : {
+            "type" : "string"
+          },
+          "isTrending" : {
+            "type" : "boolean"
+          },
+          "userId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "adminId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "ApiResponseDetail" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/Detail",
+            "description" : "응답 데이터 (실패 시 null)"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "Detail" : {
+        "type" : "object",
+        "description" : "스팟 상세",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "스팟 ID"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "장소명"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "장소 소개 문구"
+          },
+          "isTrending" : {
+            "type" : "boolean",
+            "description" : "트렌딩 여부"
+          },
+          "imageUrl" : {
+            "type" : "string",
+            "description" : "대표 이미지 URL"
+          },
+          "spotAddress" : {
+            "$ref" : "#/components/schemas/AddressInfo",
+            "description" : "주소 분류 정보"
+          },
+          "categories" : {
+            "type" : "array",
+            "description" : "카테고리 목록",
+            "items" : {
+              "$ref" : "#/components/schemas/CategoryInfo"
+            }
+          },
+          "hashtags" : {
+            "type" : "array",
+            "description" : "해시태그 목록",
+            "items" : {
+              "$ref" : "#/components/schemas/HashtagInfo"
+            }
+          },
+          "pinCount" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "핀 수"
+          },
+          "isPinned" : {
+            "type" : "boolean",
+            "description" : "요청 사용자의 핀 여부 (비회원은 항상 false)"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "등록 일시"
+          }
+        }
+      },
+      "HashtagInfo" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "icon" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ApiResponseVoid" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "description" : "응답 데이터 (실패 시 null)"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "SpotRequestCreateRequest" : {
+        "type" : "object",
+        "description" : "스팟 등록 신청 요청",
+        "properties" : {
+          "placeId" : {
+            "type" : "string",
+            "description" : "Google Maps place_id (추후 연동용)",
+            "example" : "ChIJN1t_tDeuEmsRUsoyG83frY4"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "장소명",
+            "example" : "성수 카페거리"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "장소 소개 문구"
+          },
+          "imageUrl" : {
+            "type" : "string",
+            "description" : "대표 이미지 URL"
+          },
+          "latitude" : {
+            "type" : "number",
+            "description" : "위도",
+            "example" : "37.5447700"
+          },
+          "longitude" : {
+            "type" : "number",
+            "description" : "경도",
+            "example" : "127.0557800"
+          },
+          "address" : {
+            "type" : "string",
+            "description" : "기본주소"
+          },
+          "region" : {
+            "type" : "string",
+            "description" : "시/도",
+            "example" : "서울특별시"
+          },
+          "city" : {
+            "type" : "string",
+            "description" : "시/군/구",
+            "example" : "성동구"
+          },
+          "town" : {
+            "type" : "string",
+            "description" : "읍/면/동",
+            "example" : "성수동"
+          },
+          "postalCode" : {
+            "type" : "string",
+            "description" : "우편번호",
+            "example" : "04783"
+          }
+        }
+      },
+      "ApiResponseSpotRequestInfo" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/SpotRequestInfo",
+            "description" : "응답 데이터 (실패 시 null)"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "SpotRequestInfo" : {
+        "type" : "object",
+        "description" : "스팟 신청 내역",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "신청 ID"
+          },
+          "userId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "신청 사용자 ID"
+          },
+          "placeId" : {
+            "type" : "string",
+            "description" : "Google Maps place_id"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "장소명"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "장소 소개 문구"
+          },
+          "imageUrl" : {
+            "type" : "string",
+            "description" : "대표 이미지 URL"
+          },
+          "latitude" : {
+            "type" : "number",
+            "description" : "위도"
+          },
+          "longitude" : {
+            "type" : "number",
+            "description" : "경도"
+          },
+          "address" : {
+            "type" : "string",
+            "description" : "기본주소"
+          },
+          "region" : {
+            "type" : "string",
+            "description" : "시/도"
+          },
+          "city" : {
+            "type" : "string",
+            "description" : "시/군/구"
+          },
+          "town" : {
+            "type" : "string",
+            "description" : "읍/면/동"
+          },
+          "postalCode" : {
+            "type" : "string",
+            "description" : "우편번호"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "처리 상태 (PENDING | APPROVED | REJECTED)"
+          },
+          "rejectReason" : {
+            "type" : "string",
+            "description" : "반려 사유"
+          },
+          "spotId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "승인된 스팟 ID"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "신청 일시"
+          }
+        }
+      },
+      "OAuthLoginRequest" : {
+        "type" : "object",
+        "description" : "OAuth 소셜 로그인 요청",
+        "properties" : {
+          "token" : {
+            "type" : "string",
+            "description" : "OAuth 공급자에서 발급받은 Token"
+          }
+        }
+      },
+      "ApiResponseTokenResponse" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/TokenResponse",
+            "description" : "응답 데이터 (실패 시 null)"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "TokenResponse" : {
+        "type" : "object",
+        "description" : "토큰 응답",
+        "properties" : {
+          "accessToken" : {
+            "type" : "string",
+            "description" : "Access Token (Bearer)"
+          },
+          "refreshToken" : {
+            "type" : "string",
+            "description" : "Refresh Token"
+          }
+        }
+      },
+      "RefreshRequest" : {
+        "type" : "object",
+        "description" : "Refresh Token 갱신 요청",
+        "properties" : {
+          "refreshToken" : {
+            "type" : "string",
+            "description" : "Refresh Token"
+          }
+        }
+      },
+      "SpotRequestReviewRequest" : {
+        "type" : "object",
+        "description" : "스팟 신청 검토 요청 (승인 / 반려)",
+        "properties" : {
+          "status" : {
+            "type" : "string",
+            "description" : "처리 상태",
+            "example" : "APPROVED or REJECTED"
+          },
+          "addressCode" : {
+            "type" : "string",
+            "description" : "주소 코드 (승인 시 필수, 예: seongsu)",
+            "example" : "seongsu"
+          },
+          "categoryIds" : {
+            "type" : "array",
+            "description" : "카테고리 ID 목록 (승인 시)",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            }
+          },
+          "hashtagIds" : {
+            "type" : "array",
+            "description" : "해시태그 ID 목록 (승인 시)",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            }
+          },
+          "isTrending" : {
+            "type" : "boolean",
+            "description" : "트렌딩 여부 (승인 시, 기본값 false)"
+          },
+          "rejectReason" : {
+            "type" : "string",
+            "description" : "반려 사유 (반려 시)"
+          }
+        }
+      },
+      "ApiResponseResponse" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/Response",
+            "description" : "응답 데이터 (실패 시 null)"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "Response" : {
+        "type" : "object",
+        "description" : "사용자 전체 정보 응답",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "사용자 ID"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "서비스 닉네임"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "로그인 이메일"
+          },
+          "authProvider" : {
+            "type" : "string",
+            "description" : "OAuth 공급자",
+            "enum" : [ "APPLE", "GOOGLE", "LINE" ],
+            "example" : "GOOGLE"
+          },
+          "nationality" : {
+            "type" : "string",
+            "description" : "국적 (ISO 3166-1 alpha-2)",
+            "example" : "KR"
+          },
+          "livingInKorea" : {
+            "type" : "boolean",
+            "description" : "한국 거주 인증 여부"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "가입 일시"
+          }
+        }
+      },
+      "ApiResponseListListItem" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "type" : "array",
+            "description" : "응답 데이터 (실패 시 null)",
+            "items" : {
+              "$ref" : "#/components/schemas/ListItem"
+            }
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "ListItem" : {
+        "type" : "object",
+        "description" : "스팟 목록 아이템",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "스팟 ID"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "장소명"
+          },
+          "imageUrl" : {
+            "type" : "string",
+            "description" : "대표 이미지 URL"
+          },
+          "isTrending" : {
+            "type" : "boolean",
+            "description" : "트렌딩 여부"
+          },
+          "latitude" : {
+            "type" : "number",
+            "description" : "위도"
+          },
+          "longitude" : {
+            "type" : "number",
+            "description" : "경도"
+          },
+          "categories" : {
+            "type" : "array",
+            "description" : "카테고리 목록",
+            "items" : {
+              "$ref" : "#/components/schemas/CategoryInfo"
+            }
+          },
+          "pinCount" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "핀 수"
+          },
+          "isPinned" : {
+            "type" : "boolean",
+            "description" : "요청 사용자의 핀 여부 (비회원은 항상 false)"
+          }
+        }
+      },
+      "ApiResponseListCategoryInfo" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "type" : "array",
+            "description" : "응답 데이터 (실패 시 null)",
+            "items" : {
+              "$ref" : "#/components/schemas/CategoryInfo"
+            }
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      },
+      "ApiResponseListAddressInfo" : {
+        "type" : "object",
+        "properties" : {
+          "success" : {
+            "type" : "boolean",
+            "description" : "요청 성공 여부"
+          },
+          "data" : {
+            "type" : "array",
+            "description" : "응답 데이터 (실패 시 null)",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressInfo"
+            }
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error",
+            "description" : "에러 정보 (성공 시 null)"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}
